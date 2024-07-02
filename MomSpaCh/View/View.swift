@@ -6,15 +6,27 @@
 //
 
 import UIKit
+import SnapKit
 
 class ViewController: UIViewController {
+  let logo = UIImageView()
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    print("test")
-    // Do any additional setup after loading the view.
-  }
 
+    view.backgroundColor = .white
+    logo.image = UIImage(named: "logo")
+    logo.contentMode = .scaleAspectFit
+    
+    view.addSubview(logo)
+    
+    logo.snp.makeConstraints {
+      $0.width.equalTo(120)
+      $0.height.equalTo(40)
+      $0.top.equalToSuperview().inset(60)
+      $0.leading.equalToSuperview().inset(20)
+    }
+  }
 
 }
 
