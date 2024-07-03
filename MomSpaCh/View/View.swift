@@ -48,6 +48,10 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
       $0.leading.equalToSuperview().inset(20)
     }
     
+
+    view.backgroundColor = .white
+    setupButtonsStackView()
+
   }
   var data: [String] = []
   
@@ -308,3 +312,4 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
     return CGSize(width: 130, height: 130)
   }
 }
+
