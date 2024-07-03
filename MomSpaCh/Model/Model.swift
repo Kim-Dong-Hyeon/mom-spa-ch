@@ -15,7 +15,7 @@ struct Data {
   var foodImageView = UIImageView()
   
   let foodMenu = [
-    "buger" : [UIImage(named: "buggerBeefSteak") : 10900,
+    "burger" : [UIImage(named: "buggerBeefSteak") : 10900,
                UIImage(named: "buggerBulgogi") : 10800,
                UIImage(named: "buggerChiliShrimp") : 11900,
                UIImage(named: "buggerDeepCheese") : 12900,
