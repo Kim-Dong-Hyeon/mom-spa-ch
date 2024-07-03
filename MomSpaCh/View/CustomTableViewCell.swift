@@ -5,8 +5,8 @@
 //  Created by 백시훈 on 7/3/24.
 //
 
-import Foundation
 import UIKit
+
 import SnapKit
 
 protocol CustomTableViewCellDelegate: AnyObject {
@@ -15,9 +15,9 @@ protocol CustomTableViewCellDelegate: AnyObject {
   func sumPayLabel(in cell: CustomTableViewCell)
 }
 
- 
-class CustomTableViewCell: UITableViewCell{
+class CustomTableViewCell: UITableViewCell {
   weak var delegate: CustomTableViewCellDelegate?
+  
   let plusButton: UIButton = {
       let button = UIButton(type: .system)
       button.setTitle("+", for: .normal)
@@ -58,6 +58,7 @@ class CustomTableViewCell: UITableViewCell{
       label.textAlignment = .center
       return label
   }()
+  
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     
@@ -110,31 +111,28 @@ class CustomTableViewCell: UITableViewCell{
   }
   
   
-  @objc func tappedMinusButton(){
+  @objc func tappedMinusButton() {
     if let countText = countLabel.text, let count = Int(countText) {
       
-      if count != 0{
+      if count != 0 {
         countLabel.text = String(count - 1)
-        if let payText = payLabel.text, let pay = Int(payText){
-          if String((pay / count) * (count - 1)) == "0"{
+        if let payText = payLabel.text, let pay = Int(payText) {
+          if String((pay / count) * (count - 1)) == "0" {
             print("삭제")
             delegate?.didTapDeleteButton(in: self)
             
-          }else{
+          } else {
             print("정상")
             payLabel.text = String((pay / count) * (count - 1))
-         
           }
           delegate?.sumCountLabel(in: self)
           delegate?.sumPayLabel(in: self)
         }
       }
-      
     }
   }
   
-  
-  @objc func tappedPlusButton(){
+  @objc func tappedPlusButton() {
     if let countText = countLabel.text, let count = Int(countText) {
       countLabel.text = String(count + 1)
       if let payText = payLabel.text, let pay = Int(payText){
@@ -144,7 +142,6 @@ class CustomTableViewCell: UITableViewCell{
       delegate?.sumPayLabel(in: self)
     }
   }
-  
   
   required init?(coder: NSCoder) {
       fatalError("init(coder:) has not been implemented")
