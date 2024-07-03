@@ -6,10 +6,9 @@
 //
 
 import UIKit
-
 import SnapKit
 
-class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, CustomTableViewCellDelegate{
+class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, CustomTableViewCellDelegate {
   let menuData = Data()
   private let tableView = UITableView()
   private let scrollView = UIScrollView()
@@ -24,6 +23,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   private let segmentedControl = UISegmentedControl(items: ["전체", "버거", "치킨", "사이드", "음료"])
   private let menuCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
   var test = "0"
+  var selectedCategory = "전체"
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     
@@ -42,6 +43,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     logo.contentMode = .scaleAspectFit
     
     view.addSubview(logo)
+    view.addSubview(segmentedControl)
     
     logo.snp.makeConstraints {
       $0.width.equalTo(120)
@@ -49,6 +51,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
       $0.top.equalToSuperview().inset(60)
       $0.leading.equalToSuperview().inset(20)
     }
+    
+    setSegmentedControlConstraints()
     
   }
   var data: [String] = []
@@ -60,6 +64,32 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     tableView.reloadData()
     
   }
+  
+  /// setSegmentedControl: UISegmentedControl을 설정하고 초기 선택 색상을 지정하는 메서드
+  private func setSegmentedControl() {
+    segmentedControl.selectedSegmentIndex = 0
+//    segmentedControl.backgroundColor = UIColor(red: 217/255, green: 69/255, blue: 81/255, alpha: 0.5)
+//    segmentedControl.selectedSegmentTintColor = UIColor.white
+    segmentedControl.selectedSegmentTintColor = UIColor(red: 217/255, green: 69/255, blue: 81/255, alpha: 0.5)
+    segmentedControl.addTarget(self, action: #selector(categoryChanged(_:)), for: .valueChanged)
+    view.addSubview(segmentedControl)
+  }
+  
+  /// setSegmentedControlConstraints: UISegmentedControl의 제약 조건을 설정하는 메서드
+  private func setSegmentedControlConstraints() {
+    segmentedControl.snp.makeConstraints {
+      $0.leading.trailing.equalToSuperview().inset(20)
+      $0.top.equalTo(logo.snp.bottom).offset(20)
+    }
+  }
+  
+  /// categoryChanged: UISegmentedControl의 값이 변경되었을 때 호출되는 메서드
+  /// - Parameter sender: UISegmentedControl
+  @objc private func categoryChanged(_ sender: UISegmentedControl) {
+    selectedCategory = segmentedControl.titleForSegment(at: sender.selectedSegmentIndex) ?? "전체"
+    menuCollectionView.reloadData()
+  }
+  
   func createTableView(){
     
     tableView.backgroundColor = .blue
@@ -128,10 +158,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
       data.remove(at: indexPath.row)
       tableView.deleteRows(at: [indexPath], with: .automatic)
     }
-  }
-  
-  private func setSegmentedControl() {
-    segmentedControl.selectedSegmentIndex = 0
   }
   
   func setCollectionView() {
