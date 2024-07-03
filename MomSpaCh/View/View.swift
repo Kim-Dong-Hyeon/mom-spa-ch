@@ -21,6 +21,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   let logo = UIImageView()
   static let identifier = "mainViewController"
   
+  private let segmentedControl = UISegmentedControl(items: ["전체", "버거", "치킨", "사이드", "음료"])
   private let menuCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
   var test = "0"
   override func viewDidLoad() {
@@ -34,6 +35,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     self.menuCollectionView.delegate = self
     self.menuCollectionView.register(MenuCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
     
+    setSegmentedControl()
     setCollectionView()
     setCollectionViewConstraint()
     logo.image = UIImage(named: "logo")
@@ -126,6 +128,10 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
       data.remove(at: indexPath.row)
       tableView.deleteRows(at: [indexPath], with: .automatic)
     }
+  }
+  
+  private func setSegmentedControl() {
+    segmentedControl.selectedSegmentIndex = 0
   }
   
   func setCollectionView() {
