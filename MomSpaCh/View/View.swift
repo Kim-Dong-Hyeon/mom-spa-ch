@@ -8,14 +8,25 @@
 import UIKit
 import SnapKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, CustomTableViewCellDelegate{
+  private let tableView = UITableView()
+  private let scrollView = UIScrollView()
+  private let button = UIButton()
+  private let nameLabel = UILabel()
+  private let countLabel = UILabel()
+  private let payLabel = UILabel()
+  private let allCount = UILabel()
   let logo = UIImageView()
   static let identifier = "mainViewController"
   
   private let menuCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-  
+  var test = "0"
   override func viewDidLoad() {
     super.viewDidLoad()
+    
+    self.view.backgroundColor = .white
+    
+    createTableView()
     
     self.menuCollectionView.dataSource = self
     self.menuCollectionView.delegate = self
@@ -35,8 +46,86 @@ class ViewController: UIViewController {
       $0.top.equalToSuperview().inset(60)
       $0.leading.equalToSuperview().inset(20)
     }
+    
+  }
+  var data: [String] = []
+  
+  @objc func testMethod(){
+    test = String( Int(test)! + 1 )
+    data.append(test)
+    print(data)
+    tableView.reloadData()
+    
+  }
+  func createTableView(){
+    
+    tableView.backgroundColor = .blue
+    tableView.dataSource = self
+    tableView.delegate = self
+    tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+    scrollView.backgroundColor = .brown
+    allCount.backgroundColor = .yellow
+    allCount.text = "test1"
+    payLabel.text = "test2"
+    payLabel.backgroundColor = .yellow
+    view.addSubview(scrollView)
+    view.addSubview(allCount)
+    view.addSubview(payLabel)
+    
+    scrollView.snp.makeConstraints {
+      $0.height.equalTo(180)
+      $0.leading.equalToSuperview().inset(20)
+      $0.bottom.equalToSuperview().inset(70)
+      $0.trailing.equalToSuperview().inset(100)
+    }
+    allCount.snp.makeConstraints {
+      $0.leading.equalTo(scrollView.snp.trailing).offset(10)
+      $0.centerY.equalTo(scrollView.snp.top).offset(20)
+    }
+    payLabel.snp.makeConstraints {
+      $0.leading.equalTo(scrollView.snp.trailing).offset(10)
+      $0.centerY.equalTo(scrollView.snp.top).offset(80)
+    }
+    // 테이블 뷰 설정
+    tableView.dataSource = self
+    tableView.delegate = self
+    tableView.register(CustomTableViewCell.self, forCellReuseIdentifier: "CustomCell") // 셀 등록
+    
+    // 테이블 뷰 ScrollView에 추가 및 SnapKit을 사용한 제약 조건 설정
+    scrollView.addSubview(tableView)
+    tableView.snp.makeConstraints {
+      $0.edges.equalToSuperview()
+      $0.width.equalToSuperview()
+      $0.height.equalToSuperview()
+      $0.bottom.equalToSuperview()
+      $0.trailing.equalToSuperview()
+    }
   }
   
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    return data.count
+  }
+  
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    guard let cell = tableView.dequeueReusableCell(withIdentifier: "CustomCell", for: indexPath) as? CustomTableViewCell else {
+      return UITableViewCell()
+    }
+    cell.itemNameLabel.text = data[indexPath.row]
+    cell.countLabel.text = "1"
+    cell.plusButton.tag = indexPath.row
+    cell.minusButton.tag = indexPath.row
+    cell.payLabel.text = "10000"
+    cell.delegate = self
+    return cell
+  }
+  
+  func didTapDeleteButton(in cell: CustomTableViewCell) {
+    if let indexPath = tableView.indexPath(for: cell) {
+      print(indexPath.row)
+      data.remove(at: indexPath.row)
+      tableView.deleteRows(at: [indexPath], with: .automatic)
+    }
+  }
   func setCollectionView() {
     view.addSubview(menuCollectionView)
   }
@@ -48,12 +137,29 @@ class ViewController: UIViewController {
       make.bottom.equalToSuperview().inset(150) // 추후 tableView로 변경
     }
   }
-}
-
-extension ViewController: UICollectionViewDataSource {
-  func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-    return 16
+  func sumCountLabel(in cell: CustomTableViewCell) {
+    var sum = 0
+    for row in 0..<data.count {
+      if let cell = tableView.cellForRow(at: IndexPath(row: row, section: 0)) as? CustomTableViewCell,
+         let countText = cell.countLabel.text, let count = Int(countText) {
+        sum += count
+      }
+    }
+    allCount.text = String(sum)
   }
+  func sumPayLabel(in cell: CustomTableViewCell) {
+    var sum = 0
+    for row in 0..<data.count {
+      if let cell = tableView.cellForRow(at: IndexPath(row: row, section: 0)) as? CustomTableViewCell,
+         let countText = cell.payLabel.text, let count = Int(countText) {
+        sum += count
+      }
+    }
+    payLabel.text = String(sum)
+  }
+  
+  
+  
   
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MenuCollectionViewCell.identifier, for: indexPath) as? MenuCollectionViewCell else {
@@ -63,11 +169,6 @@ extension ViewController: UICollectionViewDataSource {
   }
 }
 
-extension ViewController: UICollectionViewDelegateFlowLayout {
-  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    return CGSize(width: 130, height: 130)
-  }
-}
 
 class MenuCollectionViewCell: UICollectionViewCell {
   let menuData = Data()
@@ -124,5 +225,16 @@ class MenuCollectionViewCell: UICollectionViewCell {
       make.top.equalTo(menuImageView.snp.bottom).offset(10)
       make.leading.equalToSuperview().inset(40)
     }
+  }
+}
+
+extension ViewController: UICollectionViewDataSource {
+  func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    return 16
+  }
+}
+extension ViewController: UICollectionViewDelegateFlowLayout {
+  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    return CGSize(width: 130, height: 130)
   }
 }
