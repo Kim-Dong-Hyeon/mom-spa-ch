@@ -12,6 +12,7 @@ class ViewController: UIViewController {
   let logo = UIImageView()
   static let identifier = "mainViewController"
   
+  private let segmentedControl = UISegmentedControl(items: ["전체", "버거", "치킨", "사이드", "음료"])
   private let menuCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
   
   override func viewDidLoad() {
@@ -21,6 +22,7 @@ class ViewController: UIViewController {
     self.menuCollectionView.delegate = self
     self.menuCollectionView.register(MenuCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
     
+    setSegmentedControl()
     setCollectionView()
     setCollectionViewConstraint()
     view.backgroundColor = .white
@@ -35,6 +37,10 @@ class ViewController: UIViewController {
       $0.top.equalToSuperview().inset(60)
       $0.leading.equalToSuperview().inset(20)
     }
+  }
+  
+  private func setSegmentedControl() {
+    segmentedControl.selectedSegmentIndex = 0
   }
   
   func setCollectionView() {

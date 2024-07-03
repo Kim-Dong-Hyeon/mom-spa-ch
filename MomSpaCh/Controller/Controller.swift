@@ -6,3 +6,11 @@
 //
 
 import Foundation
+import UIKit
+
+class Controller {
+  
+  @objc func menuButtonTapped(_ sender: UIButton) {
+    
+  }
+}
