@@ -8,7 +8,8 @@
 import UIKit
 import SnapKit
 
-class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, CustomTableViewCellDelegate {
+class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, CustomTableViewCellDelegate, UICollectionViewDelegate{
+
   let menuData = Data()
   private let tableView = UITableView()
   private let scrollView = UIScrollView()
@@ -40,6 +41,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     setupButtonsStackView()
     setCollectionView()
     setCollectionViewConstraint()
+    
+    
     logo.image = UIImage(named: "logo")
     logo.contentMode = .scaleAspectFit
     
@@ -55,6 +58,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     
     setSegmentedControlConstraints()
     setupButtonsStackView()
+
   }
   var data: [String] = []
   
@@ -282,7 +286,7 @@ extension ViewController: UICollectionViewDataSource {
 
 extension ViewController: UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    return CGSize(width: 130, height: 130)
+    return CGSize(width: 130, height: 170)
   }
 }
 
