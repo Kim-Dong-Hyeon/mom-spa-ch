@@ -10,10 +10,10 @@ import UIKit
 import SnapKit
 
 class MenuCollectionViewCell: UICollectionViewCell {
-  let menuData = Data()
+  lazy var menuData = Data()
   static let identifier = "cell"
   
-  private let menuButton: UIButton = {
+  private lazy var menuButton: UIButton = {
     var menuButton = UIButton()
     menuButton.backgroundColor = .systemBackground
     return menuButton
@@ -37,14 +37,21 @@ class MenuCollectionViewCell: UICollectionViewCell {
     super.init(frame: frame)
     [menuButton, priceLabel, nameLabel].forEach { contentView.addSubview($0) }
     setConstraints()
-    
-    nameLabel.text = "이름"
     menuButton.addTarget(self, action: #selector(buttonClicked), for: .touchUpInside)
   }
   
   required init?(coder: NSCoder) {
     super.init(coder: coder)
     fatalError("init(coder:) has not been implemented")
+  }
+  
+  func configure(withImageName imageName: String, price: Int, name: String) {
+    if let image = UIImage(named: imageName) {
+      menuButton.setTitle(imageName, for: .normal)
+      menuButton.setImage(image, for: .normal)
+    }
+    priceLabel.text = "\(price) 원"
+    nameLabel.text = name
   }
   
   func setConstraints() {
@@ -68,7 +75,7 @@ class MenuCollectionViewCell: UICollectionViewCell {
     }
   }
   
-  @objc func buttonClicked() {
-    print("1")
+  @objc func buttonClicked(sender: UIButton) {
+    print(menuData.koreanName[sender.currentTitle!]!)
   }
 }
