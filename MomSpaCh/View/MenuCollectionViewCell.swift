@@ -50,6 +50,7 @@ class MenuCollectionViewCell: UICollectionViewCell {
   
   func configure(withImageName imageName: String, price: Int, name: String) {
     if let image = UIImage(named: imageName) {
+      menuButton.setTitle(imageName, for: .normal)
       menuButton.setImage(image, for: .normal)
     }
     priceLabel.text = "\(price) 원"
@@ -77,11 +78,13 @@ class MenuCollectionViewCell: UICollectionViewCell {
     }
   }
   
+
   @objc func buttonClicked() {
     var price = priceLabel.text!.filter { $0 != "원" && $0 != " "}
     var name = nameLabel.text!
     print(name)
     delegate?.addOrderList(price, name)
     print("1")
+    print(menuData.koreanName[sender.currentTitle!]!)
   }
 }
