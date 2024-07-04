@@ -74,7 +74,7 @@ class CustomTableViewCell: UITableViewCell {
     // SnapKit을 사용하여 레이아웃 설정
     plusButton.snp.makeConstraints {
         //make.trailing.equalTo(countLabel.snp.leading).inset(50)
-      $0.leading.equalTo(itemNameLabel.snp.trailing).offset(90)
+      $0.leading.equalTo(itemNameLabel.snp.trailing).offset(20)
       $0.centerY.equalToSuperview()
       $0.height.equalTo(20)
       $0.width.equalTo(20)

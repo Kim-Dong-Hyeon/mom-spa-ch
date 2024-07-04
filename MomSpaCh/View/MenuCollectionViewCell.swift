@@ -8,8 +8,11 @@
 import UIKit
 
 import SnapKit
-
+protocol MenuCollectionViewCellDelegate: AnyObject {
+  func addOrderList(_: String, _: String)
+}
 class MenuCollectionViewCell: UICollectionViewCell {
+  weak var delegate: MenuCollectionViewCellDelegate?
   lazy var menuData = Data()
   static let identifier = "cell"
   
@@ -75,7 +78,13 @@ class MenuCollectionViewCell: UICollectionViewCell {
     }
   }
   
+
   @objc func buttonClicked(sender: UIButton) {
+    var price = priceLabel.text!.filter { $0 != "원" && $0 != " "}
+    var name = nameLabel.text!
+    print(name)
+    delegate?.addOrderList(price, name)
+    print("1")
     print(menuData.koreanName[sender.currentTitle!]!)
   }
 }
