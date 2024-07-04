@@ -5,33 +5,18 @@
 //  Created by 김동현 on 7/2/24.
 //
 
-import UIKit
-
 struct Data {
   var totalPrice = 0
   var count = 0
   var totalCount = 0
-  var foodImageView = UIImageView()
   
-  let burger = [ "burgerBeefSteak",
-                 "burgerBulgogi",
-                 "burgerChiliShrimp",
-                 "burgerDeepCheese",
-                 "burgerDeluxeBulgogi",
-                 "burgerFillet",
-                 "burgerGrilledBeef",
-                 "burgerInvredible",
-                 "burgerShrimp",
-                 "burgerShrimpBulgogi",
-                 "burgerSpicyThigh",
-                 "burgerThigh"]
+  let burger = ["burgerBeefSteak", "burgerBulgogi", "burgerChiliShrimp", "burgerDeepCheese",
+                 "burgerDeluxeBulgogi", "burgerFillet", "burgerGrilledBeef", "burgerInvredible",
+                 "burgerShrimp", "burgerShrimpBulgogi", "burgerSpicyThigh", "burgerThigh"]
   
-  let chicken = ["chickenCheeseSprinkled",
-                 "chickenChipao",
-                 "chickenFried",
-                 "chickenHalf",
-                 "chickenSoyGalic"]
-  
+
+  let chicken = ["chickenCheeseSprinkled", "chickenChipao", "chickenFried", "chickenHalf", "chickenSoyGalic"]
+
   let sideMenu = ["sideCheeseBall", "sideCheeseStick", "sideCorn", "sideFrenchFries", "sidePopcornBall", "sideTwistSnack"]
   
   let drink = ["drinkAmericano", "drinkCider", "drinkCola", "drinkGreenGrape", "drinkLemonAde", "drinkOrangeJuic"]
@@ -66,4 +51,9 @@ struct Data {
     "drinkGreenGrapeAde" : "청포도에이드",
     "drinkLemonAde" : "레몬에이드",
     "drinkOrangeJuice" : "오렌지주스"]
+  
+  let burgerPrice = [12900, 11900, 13900, 12900, 11900, 9900, 11800, 11900, 13900, 12900, 9900, 8900]
+  let chickenPrice = [18900, 21900, 23900, 22900, 21900]
+  let sidePrice = [3900, 4900, 3900, 2900, 3900, 4900]
+  let drinkPrice = [2900, 1900, 1900, 2900, 2900, 3900]
 }

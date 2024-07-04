@@ -42,7 +42,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     setupButtonsStackView()
     setCollectionView()
     setCollectionViewConstraint()
-    
+  
     
     logo.image = UIImage(named: "logo")
     logo.contentMode = .scaleAspectFit
@@ -269,11 +269,24 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     present(completedAlert, animated: true, completion: nil)
   }
   
+  @objc func segmentedControlValueChanged(_ sender: UISegmentedControl) {
+      if sender.selectedSegmentIndex == 0 {
+          print("se")
+      }
+    print("a")
+  }
+  
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MenuCollectionViewCell.identifier, for: indexPath) as? MenuCollectionViewCell else {
       return UICollectionViewCell()
     }
+    let item = menuData.burger[indexPath.item]
+    cell.configure(withImageName: item, price: menuData.burgerPrice[indexPath.item], name: changeName(item))
     return cell
+  }
+  
+  func changeName(_ name: String) -> String {
+    return menuData.koreanName[name]!
   }
 }
 
