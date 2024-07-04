@@ -6,10 +6,10 @@
 //
 
 import UIKit
-
 import SnapKit
 
 class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, CustomTableViewCellDelegate, UICollectionViewDelegate{
+
   let menuData = Data()
   private let tableView = UITableView()
   private let scrollView = UIScrollView()
@@ -21,8 +21,11 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   let logo = UIImageView()
   static let identifier = "mainViewController"
   
+  private let segmentedControl = UISegmentedControl(items: ["전체", "버거", "치킨", "사이드", "음료"])
   private let menuCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
   var test = "0"
+  var selectedCategory = "전체"
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     
@@ -34,6 +37,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     self.menuCollectionView.delegate = self
     self.menuCollectionView.register(MenuCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
     
+    setSegmentedControl()
+    setupButtonsStackView()
     setCollectionView()
     setCollectionViewConstraint()
     
@@ -42,6 +47,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     logo.contentMode = .scaleAspectFit
     
     view.addSubview(logo)
+    view.addSubview(segmentedControl)
     
     logo.snp.makeConstraints {
       $0.width.equalTo(120)
@@ -49,6 +55,10 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
       $0.top.equalToSuperview().inset(60)
       $0.leading.equalToSuperview().inset(20)
     }
+    
+    setSegmentedControlConstraints()
+    setupButtonsStackView()
+
   }
   var data: [String] = []
   
@@ -59,6 +69,32 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     tableView.reloadData()
     
   }
+  
+  /// setSegmentedControl: UISegmentedControl을 설정하고 초기 선택 색상을 지정하는 메서드
+  private func setSegmentedControl() {
+    segmentedControl.selectedSegmentIndex = 0
+//    segmentedControl.backgroundColor = UIColor(red: 217/255, green: 69/255, blue: 81/255, alpha: 0.5)
+//    segmentedControl.selectedSegmentTintColor = UIColor.white
+    segmentedControl.selectedSegmentTintColor = UIColor(red: 217/255, green: 69/255, blue: 81/255, alpha: 0.5)
+    segmentedControl.addTarget(self, action: #selector(categoryChanged(_:)), for: .valueChanged)
+    view.addSubview(segmentedControl)
+  }
+  
+  /// setSegmentedControlConstraints: UISegmentedControl의 제약 조건을 설정하는 메서드
+  private func setSegmentedControlConstraints() {
+    segmentedControl.snp.makeConstraints {
+      $0.leading.trailing.equalToSuperview().inset(20)
+      $0.top.equalTo(logo.snp.bottom).offset(20)
+    }
+  }
+  
+  /// categoryChanged: UISegmentedControl의 값이 변경되었을 때 호출되는 메서드
+  /// - Parameter sender: UISegmentedControl
+  @objc private func categoryChanged(_ sender: UISegmentedControl) {
+    selectedCategory = segmentedControl.titleForSegment(at: sender.selectedSegmentIndex) ?? "전체"
+    menuCollectionView.reloadData()
+  }
+  
   func createTableView(){
     
     tableView.backgroundColor = .blue
@@ -163,6 +199,77 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     payLabel.text = String(sum)
   }
   
+  private func setupButtonsStackView() {
+    let cancelButton = createCancelButton()
+    let orderButton = createOrderButton()
+    
+    let stackView = UIStackView(arrangedSubviews: [cancelButton, orderButton])
+    stackView.axis = .horizontal
+    stackView.alignment = .fill
+    stackView.distribution = .fillEqually
+    stackView.spacing = 10
+    
+    view.addSubview(stackView)
+    
+    stackView.snp.makeConstraints {
+      $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
+      $0.leading.equalTo(view.safeAreaLayoutGuide.snp.leading).offset(20)
+      $0.trailing.equalTo(view.safeAreaLayoutGuide.snp.trailing).offset(-20)
+      $0.height.equalTo(50)
+    }
+  }
+  
+  private func createOrderButton() -> UIButton {
+    let button = UIButton(type: .system)
+    button.setTitle("주문하기", for: .normal)
+    button.titleLabel?.font = UIFont(name: "HelveticaNeue-Bold", size: 20)
+    button.backgroundColor = UIColor(red: 235/255, green: 51/255, blue: 77/255, alpha: 1.0)
+    button.setTitleColor(.white, for: .normal)
+    button.layer.cornerRadius = 5
+    
+    button.addTarget(self, action: #selector(orderButtonTapped), for: .touchUpInside)
+    return button
+  }
+  
+  private func createCancelButton() -> UIButton {
+    let button = UIButton(type: .system)
+    button.setTitle("취소", for: .normal)
+    button.titleLabel?.font = UIFont(name: "HelveticaNeue-Bold", size: 20)
+    button.backgroundColor = .white
+    button.setTitleColor(UIColor(red: 235/255, green: 51/255, blue: 77/255, alpha: 1.0), for: .normal)
+    button.layer.borderWidth = 1
+    button.layer.borderColor = UIColor(red: 235/255, green: 51/255, blue: 77/255, alpha: 1.0).cgColor
+    button.layer.cornerRadius = 5
+    
+    //button.addTarget(self, action: #selector(), for: .touchUpInside) 취소 눌렀을 때 동작 추가 예정
+    return button
+  }
+  
+  @objc private func cancelButtonTapped() {
+    // 아니오 눌렀을 때 동작 추가 예정
+  }
+  
+  @objc private func orderButtonTapped() {
+    // 최종 금액 추가 예정
+    let alert = UIAlertController(title: "최종 결제 금액 원입니다. 주문하시겠습니까?", message: "", preferredStyle: .alert)
+    let yesAction = UIAlertAction(title: "네", style: .default) { _ in
+      self.orderCompletedAlert()
+    }
+    let noAction = UIAlertAction(title: "아니오", style: .cancel, handler: nil)
+    alert.addAction(yesAction)
+    alert.addAction(noAction)
+    
+    present(alert, animated: true, completion: nil)
+  }
+  
+  private func orderCompletedAlert() {
+    let completedAlert = UIAlertController(title: "주문 완료되었습니다.", message: "", preferredStyle: .alert)
+    let okAction = UIAlertAction(title: "확인", style: .default, handler: nil)
+    completedAlert.addAction(okAction)
+    
+    present(completedAlert, animated: true, completion: nil)
+  }
+  
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MenuCollectionViewCell.identifier, for: indexPath) as? MenuCollectionViewCell else {
       return UICollectionViewCell()
@@ -176,8 +283,10 @@ extension ViewController: UICollectionViewDataSource {
     return (menuData.foodMenu["burger"]?.keys.count)!
   }
 }
+
 extension ViewController: UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
     return CGSize(width: 130, height: 170)
   }
 }
+
