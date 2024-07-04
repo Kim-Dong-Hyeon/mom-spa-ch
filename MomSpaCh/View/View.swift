@@ -269,19 +269,41 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     present(completedAlert, animated: true, completion: nil)
   }
   
-  @objc func segmentedControlValueChanged(_ sender: UISegmentedControl) {
-      if sender.selectedSegmentIndex == 0 {
-          print("se")
-      }
-    print("a")
-  }
-  
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MenuCollectionViewCell.identifier, for: indexPath) as? MenuCollectionViewCell else {
       return UICollectionViewCell()
     }
-    let item = menuData.burger[indexPath.item]
-    cell.configure(withImageName: item, price: menuData.burgerPrice[indexPath.item], name: changeName(item))
+    
+//    var menuItems: [String]
+    switch selectedCategory {
+    case "버거":
+      let item = menuData.burger[indexPath.item]
+      cell.configure(withImageName: item, price: menuData.burgerPrice[indexPath.item], name: changeName(item))
+    case "치킨":
+      let item = menuData.chicken[indexPath.item]
+      cell.configure(withImageName: item, price: menuData.chickenPrice[indexPath.item], name: changeName(item))
+    case "사이드":
+      let item = menuData.sideMenu[indexPath.item]
+      cell.configure(withImageName: item, price: menuData.sidePrice[indexPath.item], name: changeName(item))
+    case "음료":
+      let item = menuData.drink[indexPath.item]
+      cell.configure(withImageName: item, price: menuData.drinkPrice[indexPath.item], name: changeName(item))
+    default:
+      var allItemName: [String] = menuData.burger
+      menuData.chicken.forEach { allItemName.append($0) }
+      menuData.sideMenu.forEach { allItemName.append($0) }
+      menuData.drink.forEach { allItemName.append($0) }
+      var allItemPrice: [Int] = menuData.burgerPrice
+      menuData.chickenPrice.forEach { allItemPrice.append($0) }
+      menuData.sidePrice.forEach { allItemPrice.append($0) }
+      menuData.drinkPrice.forEach { allItemPrice.append($0) }
+      
+      cell.configure(withImageName: allItemName[indexPath.item], price: allItemPrice[indexPath.item], name: changeName(allItemName[indexPath.item]))
+    }
+    
+//    let item = menuData.burger[indexPath.item]
+//    cell.configure(withImageName: item, price: menuData.burgerPrice[indexPath.item], name: changeName(item))
+    
     return cell
   }
   
@@ -292,7 +314,18 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 
 extension ViewController: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-    return (menuData.burger.count)
+    switch selectedCategory {
+    case "버거":
+      return menuData.burger.count
+    case "치킨":
+      return menuData.chicken.count
+    case "사이드":
+      return menuData.sideMenu.count
+    case "음료":
+      return menuData.drink.count
+    default:
+      return menuData.burger.count + menuData.chicken.count + menuData.sideMenu.count + menuData.drink.count
+    }
   }
 }
 

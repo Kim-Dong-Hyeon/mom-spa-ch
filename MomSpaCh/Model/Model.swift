@@ -10,16 +10,15 @@ struct Data {
   var count = 0
   var totalCount = 0
   
-  let burger = ["burgerBeefSteak", "burgerBulgogi", "burgerChiliShrimp", "burgerDeepCheese",
+  let burger : [String] = ["burgerBeefSteak", "burgerBulgogi", "burgerChiliShrimp", "burgerDeepCheese",
                  "burgerDeluxeBulgogi", "burgerFillet", "burgerGrilledBeef", "burgerInvredible",
                  "burgerShrimp", "burgerShrimpBulgogi", "burgerSpicyThigh", "burgerThigh"]
   
-
   let chicken = ["chickenCheeseSprinkled", "chickenChipao", "chickenFried", "chickenHalf", "chickenSoyGalic"]
 
   let sideMenu = ["sideCheeseBall", "sideCheeseStick", "sideCorn", "sideFrenchFries", "sidePopcornBall", "sideTwistSnack"]
   
-  let drink = ["drinkAmericano", "drinkCider", "drinkCola", "drinkGreenGrape", "drinkLemonAde", "drinkOrangeJuic"]
+  let drink = ["drinkAmericano", "drinkCider", "drinkCola", "drinkGreenGrapeAde", "drinkLemonAde", "drinkOrangeJuice"]
   
   let koreanName = [
     "burgerBeefSteak" : "비프스테이크버거",

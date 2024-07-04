@@ -47,6 +47,7 @@ class MenuCollectionViewCell: UICollectionViewCell {
   
   func configure(withImageName imageName: String, price: Int, name: String) {
     if let image = UIImage(named: imageName) {
+      menuButton.setTitle(imageName, for: .normal)
       menuButton.setImage(image, for: .normal)
     }
     priceLabel.text = "\(price) 원"
@@ -74,7 +75,7 @@ class MenuCollectionViewCell: UICollectionViewCell {
     }
   }
   
-  @objc func buttonClicked() {
-    print("1")
+  @objc func buttonClicked(sender: UIButton) {
+    print(menuData.koreanName[sender.currentTitle!]!)
   }
 }
