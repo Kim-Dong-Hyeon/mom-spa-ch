@@ -9,46 +9,41 @@ import UIKit
 
 import SnapKit
 
-class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, CustomTableViewCellDelegate, UICollectionViewDelegate,MenuCollectionViewCellDelegate{
-
-  let menuData = Data()
-  private let tableView = UITableView()
-  private let scrollView = UIScrollView()
-  private let button = UIButton()
-  private let nameLabel = UILabel()
-  private let countLabel = UILabel()
-  private let payLabel = UILabel()
-  private let allCount = UILabel()
-  let logo = UIImageView()
-  static let identifier = "mainViewController"
+class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, 
+                        CustomTableViewCellDelegate, UICollectionViewDelegate,MenuCollectionViewCellDelegate {
   
+  static let identifier = "mainViewController"
+  private let allCount = UILabel()
+  private let button = UIButton()
+  private let countLabel = UILabel()
+  // CodeConvention 재확인 필요
+  private let menuCollectionView = UICollectionView(
+    frame: .zero,
+    collectionViewLayout: UICollectionViewFlowLayout()
+  )
+  private let nameLabel = UILabel()
+  private let payLabel = UILabel()
+  private let scrollView = UIScrollView()
   private let segmentedControl = UISegmentedControl(items: ["전체", "버거", "치킨", "사이드", "음료"])
-  private let menuCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+  private let tableView = UITableView()
+  let logo : UIImageView = {
+    let logo = UIImageView()
+    logo.image = UIImage(named: "logo")
+    logo.contentMode = .scaleAspectFit
+    return logo
+  }()
+  let menuData = Data()
   var test = "0"
   var selectedCategory = "전체"
   
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    self.view.backgroundColor = .systemBackground
+    view.backgroundColor = .systemBackground
     
-    createTableView()
-    
-    self.menuCollectionView.dataSource = self
-    self.menuCollectionView.delegate = self
-    //self.menuCollectionView.register(MenuCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
-    self.menuCollectionView.register(MenuCollectionViewCell.self, forCellWithReuseIdentifier: MenuCollectionViewCell.identifier)
-    setSegmentedControl()
-    setupButtonsStackView()
-    setCollectionView()
-    setCollectionViewConstraint()
-  
-    
-    logo.image = UIImage(named: "logo")
-    logo.contentMode = .scaleAspectFit
-    
-    view.addSubview(logo)
-    view.addSubview(segmentedControl)
+    [logo, segmentedControl, scrollView, allCount, payLabel, menuCollectionView].forEach {
+      view.addSubview( $0 )
+    }
     
     logo.snp.makeConstraints {
       $0.width.equalTo(120)
@@ -57,46 +52,57 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
       $0.leading.equalToSuperview().inset(20)
     }
     
-    setSegmentedControlConstraints()
+    setupTableView()
+    setupSegmentedControl()
+    setupCollectionView()
+    setupCollectionViewConstraint()
+    setupSegmentedControlConstraints()
     setupButtonsStackView()
-
   }
-  var nameData: [String] = []
-  var priceData: [String] = []
   
+  // Model 이동 예정
+  var nameData: [String] = []
+  var priceData: [Int] = []
+  var countData: [Int] = []
+  var checkDuplication: Bool = false
   func addOrderList(_ pay: String, _ name: String){
-    nameData.append(name)
-    priceData.append(pay)
-    allCount.text = String(nameData.count)
-    payLabel.text = sumOfArray(priceData)
+    if nameData.contains(name){
+      checkDuplication = true//중복일때
+      for i in 0..<nameData.count{
+        if nameData[i] == name{
+          countData[i] += 1
+          priceData[i] += Int(pay)!
+        }
+      }
+      print(countData.reduce(0, +))
+      allCount.text = String(countData.reduce(0, +))
+    }else{
+      checkDuplication = false
+      nameData.append(name)
+      priceData.append(Int(pay)!)
+      countData.append(1)
+    }
+    allCount.text = String(countData.reduce(0, +))
+    payLabel.text = String(priceData.reduce(0, +))
     tableView.reloadData()
   }
   
-  func sumOfArray(_ array: [String]) -> String {
-      var sum = 0
-      for string in array {
-          if let number = Int(string) {
-              sum += number
-          }
-      }
-      return String(sum)
-  }
   /// setSegmentedControl: UISegmentedControl을 설정하고 초기 선택 색상을 지정하는 메서드
-  private func setSegmentedControl() {
+  private func setupSegmentedControl() {
     segmentedControl.selectedSegmentIndex = 0
     segmentedControl.selectedSegmentTintColor = UIColor(red: 217/255, green: 69/255, blue: 81/255, alpha: 0.5)
     segmentedControl.addTarget(self, action: #selector(categoryChanged(_:)), for: .valueChanged)
-    view.addSubview(segmentedControl)
   }
   
-  /// setSegmentedControlConstraints: UISegmentedControl의 제약 조건을 설정하는 메서드
-  private func setSegmentedControlConstraints() {
+  /// setupSegmentedControlConstraints: UISegmentedControl의 제약 조건을 설정하는 메서드
+  private func setupSegmentedControlConstraints() {
     segmentedControl.snp.makeConstraints {
       $0.leading.trailing.equalToSuperview().inset(20)
       $0.top.equalTo(logo.snp.bottom).offset(20)
     }
   }
   
+  // View or Controller 정하기
   /// categoryChanged: UISegmentedControl의 값이 변경되었을 때 호출되는 메서드
   /// - Parameter sender: UISegmentedControl
   @objc private func categoryChanged(_ sender: UISegmentedControl) {
@@ -104,8 +110,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     menuCollectionView.reloadData()
   }
   
-  func createTableView(){
-    
+  // Constraints 묶어야 함
+  func setupTableView() {
     tableView.backgroundColor = .blue
     tableView.dataSource = self
     tableView.delegate = self
@@ -115,9 +121,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     allCount.text = ""
     payLabel.text = ""
     payLabel.backgroundColor = .yellow
-    view.addSubview(scrollView)
-    view.addSubview(allCount)
-    view.addSubview(payLabel)
     
     scrollView.snp.makeConstraints {
       $0.height.equalTo(130)
@@ -133,9 +136,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
       $0.leading.equalTo(scrollView.snp.trailing).offset(10)
       $0.centerY.equalTo(scrollView.snp.top).offset(80)
     }
-    // 테이블 뷰 설정
-    tableView.dataSource = self
-    tableView.delegate = self
+    
     tableView.register(CustomTableViewCell.self, forCellReuseIdentifier: "CustomCell") // 셀 등록
     
     // 테이블 뷰 ScrollView에 추가 및 SnapKit을 사용한 제약 조건 설정
@@ -158,10 +159,13 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
       return UITableViewCell()
     }
     cell.itemNameLabel.text = nameData[indexPath.row]
-    cell.countLabel.text = "1"
+
+    cell.countLabel.text = String(countData[indexPath.row])
+    
+    
     cell.plusButton.tag = indexPath.row
     cell.minusButton.tag = indexPath.row
-    cell.payLabel.text = priceData[indexPath.row]
+    cell.payLabel.text = String(priceData[indexPath.row])
     cell.delegate = self
     return cell
   }
@@ -175,30 +179,88 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
   }
   
-  func setCollectionView() {
+  func setupCollectionView() {
+    self.menuCollectionView.dataSource = self
+    self.menuCollectionView.delegate = self
+    // CodeConvention 재확인 필요
+    self.menuCollectionView.register(
+      MenuCollectionViewCell.self,
+      forCellWithReuseIdentifier: MenuCollectionViewCell.identifier
+    )
     view.addSubview(menuCollectionView)
   }
   
-  func setCollectionViewConstraint() {
-    menuCollectionView.snp.makeConstraints { make in
-      make.leading.trailing.equalToSuperview().inset(30)
-      make.top.equalToSuperview().inset(150)
-      make.bottom.equalToSuperview().inset(300) // 추후 tableView로 변경
+  func setupCollectionViewConstraint() {
+    menuCollectionView.snp.makeConstraints {
+      $0.leading.trailing.equalToSuperview().inset(30)
+      $0.top.equalToSuperview().inset(150)
+      $0.bottom.equalToSuperview().inset(300) // 추후 tableView로 변경
     }
   }
   
-  func sumCountLabel(in cell: CustomTableViewCell) {
+  func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MenuCollectionViewCell.identifier, for: indexPath) as? MenuCollectionViewCell else {
+      return UICollectionViewCell()
+    }
+    
+    //    var menuItems: [String]
+    switch selectedCategory {
+    case "버거":
+      let item = menuData.burger[indexPath.item]
+      cell.configure(withImageName: item, price: menuData.burgerPrice[indexPath.item], name: changeName(item))
+    case "치킨":
+      let item = menuData.chicken[indexPath.item]
+      cell.configure(withImageName: item, price: menuData.chickenPrice[indexPath.item], name: changeName(item))
+    case "사이드":
+      let item = menuData.sideMenu[indexPath.item]
+      cell.configure(withImageName: item, price: menuData.sidePrice[indexPath.item], name: changeName(item))
+    case "음료":
+      let item = menuData.drink[indexPath.item]
+      cell.configure(withImageName: item, price: menuData.drinkPrice[indexPath.item], name: changeName(item))
+    default:
+      var allItemName: [String] = menuData.burger
+      menuData.chicken.forEach { allItemName.append($0) }
+      menuData.sideMenu.forEach { allItemName.append($0) }
+      menuData.drink.forEach { allItemName.append($0) }
+      var allItemPrice: [Int] = menuData.burgerPrice
+      menuData.chickenPrice.forEach { allItemPrice.append($0) }
+      menuData.sidePrice.forEach { allItemPrice.append($0) }
+      menuData.drinkPrice.forEach { allItemPrice.append($0) }
+      
+      cell.configure(withImageName: allItemName[indexPath.item], price: allItemPrice[indexPath.item], name: changeName(allItemName[indexPath.item]))
+      
+    }
+    cell.delegate = self
+    return cell
+  }
+  
+  func changeName(_ name: String) -> String {
+    return menuData.koreanName[name]!
+  }
+  
+  func plusButtonTap(in cell: CustomTableViewCell) {
     var sum = 0
+    var paySum = 0
     for row in 0..<nameData.count {
       if let cell = tableView.cellForRow(at: IndexPath(row: row, section: 0)) as? CustomTableViewCell,
-         let countText = cell.countLabel.text, let count = Int(countText) {
-        sum += count
+         let countText = cell.itemNameLabel.text, let pay = cell.payLabel.text{
+          for i in 0..<nameData.count{
+            if nameData[i] == countText{
+              var count = Int(countData[i])
+              countData[i] += 1
+              //paySum = Int(pay)!
+              sum = countData[i]
+              priceData[i] = (priceData[i] / count) * (count + 1)
+              paySum = priceData.reduce(0, +)
+            }
+          }
       }
     }
     allCount.text = String(sum)
+    payLabel.text = String(paySum)
   }
   
-  func sumPayLabel(in cell: CustomTableViewCell) {
+  func minusButtonTap(in cell: CustomTableViewCell) {
     var sum = 0
     for row in 0..<nameData.count {
       if let cell = tableView.cellForRow(at: IndexPath(row: row, section: 0)) as? CustomTableViewCell,
@@ -278,46 +340,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     completedAlert.addAction(okAction)
     
     present(completedAlert, animated: true, completion: nil)
-  }
-  
-  func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-    guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MenuCollectionViewCell.identifier, for: indexPath) as? MenuCollectionViewCell else {
-      return UICollectionViewCell()
-    }
-    
-//    var menuItems: [String]
-    switch selectedCategory {
-    case "버거":
-      let item = menuData.burger[indexPath.item]
-      cell.configure(withImageName: item, price: menuData.burgerPrice[indexPath.item], name: changeName(item))
-    case "치킨":
-      let item = menuData.chicken[indexPath.item]
-      cell.configure(withImageName: item, price: menuData.chickenPrice[indexPath.item], name: changeName(item))
-    case "사이드":
-      let item = menuData.sideMenu[indexPath.item]
-      cell.configure(withImageName: item, price: menuData.sidePrice[indexPath.item], name: changeName(item))
-    case "음료":
-      let item = menuData.drink[indexPath.item]
-      cell.configure(withImageName: item, price: menuData.drinkPrice[indexPath.item], name: changeName(item))
-    default:
-      var allItemName: [String] = menuData.burger
-      menuData.chicken.forEach { allItemName.append($0) }
-      menuData.sideMenu.forEach { allItemName.append($0) }
-      menuData.drink.forEach { allItemName.append($0) }
-      var allItemPrice: [Int] = menuData.burgerPrice
-      menuData.chickenPrice.forEach { allItemPrice.append($0) }
-      menuData.sidePrice.forEach { allItemPrice.append($0) }
-      menuData.drinkPrice.forEach { allItemPrice.append($0) }
-      
-      cell.configure(withImageName: allItemName[indexPath.item], price: allItemPrice[indexPath.item], name: changeName(allItemName[indexPath.item]))
-      
-    }
-    cell.delegate = self
-    return cell
-  }
-  
-  func changeName(_ name: String) -> String {
-    return menuData.koreanName[name]!
   }
 }
 
