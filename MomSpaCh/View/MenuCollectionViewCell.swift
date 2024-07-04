@@ -79,12 +79,11 @@ class MenuCollectionViewCell: UICollectionViewCell {
   }
   
 
-  @objc func buttonClicked() {
+  @objc func buttonClicked(sender: UIButton) {
     var price = priceLabel.text!.filter { $0 != "원" && $0 != " "}
-    var name = nameLabel.text!
+    var name = menuData.koreanName[sender.currentTitle!]!
     print(name)
     delegate?.addOrderList(price, name)
-    print("1")
-    print(menuData.koreanName[sender.currentTitle!]!)
+
   }
 }
