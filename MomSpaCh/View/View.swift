@@ -280,7 +280,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 
 extension ViewController: UICollectionViewDataSource {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-    return (menuData.foodMenu["burger"]?.keys.count)!
+    return (menuData.burger.count)
   }
 }
 
