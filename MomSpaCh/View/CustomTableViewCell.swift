@@ -11,8 +11,8 @@ import SnapKit
 
 protocol CustomTableViewCellDelegate: AnyObject {
   func didTapDeleteButton(in cell: CustomTableViewCell)
-  func sumCountLabel(in cell: CustomTableViewCell)
-  func sumPayLabel(in cell: CustomTableViewCell)
+  func plusButtonTap(in cell: CustomTableViewCell)
+  func minusButtonTap(in cell: CustomTableViewCell)
 }
 
 class CustomTableViewCell: UITableViewCell {
@@ -125,8 +125,8 @@ class CustomTableViewCell: UITableViewCell {
             print("정상")
             payLabel.text = String((pay / count) * (count - 1))
           }
-          delegate?.sumCountLabel(in: self)
-          delegate?.sumPayLabel(in: self)
+          
+          delegate?.minusButtonTap(in: self)
         }
       }
     }
@@ -138,8 +138,8 @@ class CustomTableViewCell: UITableViewCell {
       if let payText = payLabel.text, let pay = Int(payText){
         payLabel.text = String((pay / count) * (count + 1))
       }
-      delegate?.sumCountLabel(in: self)
-      delegate?.sumPayLabel(in: self)
+      delegate?.plusButtonTap(in: self)
+      //delegate?.sumPayLabel(in: self)
     }
   }
   

@@ -62,28 +62,33 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   
   // Model 이동 예정
   var nameData: [String] = []
-  var priceData: [String] = []
-  
+  var priceData: [Int] = []
+  var countData: [Int] = []
+  var checkDuplication: Bool = false
   func addOrderList(_ pay: String, _ name: String){
-    nameData.append(name)
-    priceData.append(pay)
-    allCount.text = String(nameData.count)
-    payLabel.text = sumOfArray(priceData)
+    if nameData.contains(name){
+      checkDuplication = true//중복일때
+      for i in 0..<nameData.count{
+        if nameData[i] == name{
+          countData[i] += 1
+          priceData[i] += Int(pay)!
+        }
+      }
+      print(countData.reduce(0, +))
+      allCount.text = String(countData.reduce(0, +))
+    }else{
+      checkDuplication = false
+      nameData.append(name)
+      priceData.append(Int(pay)!)
+      countData.append(1)
+    }
+    allCount.text = String(countData.reduce(0, +))
+    payLabel.text = String(priceData.reduce(0, +))
     tableView.reloadData()
   }
   
-  func sumOfArray(_ array: [String]) -> String {
-    var sum = 0
-    for string in array {
-      if let number = Int(string) {
-        sum += number
-      }
-    }
-    return String(sum)
-  }
-  
-  /// setupSegmentedControl: UISegmentedControl을 설정하고 초기 선택 색상을 지정하는 메서드
-  private func setupSegmentedControl() {
+  /// setSegmentedControl: UISegmentedControl을 설정하고 초기 선택 색상을 지정하는 메서드
+  private func setSegmentedControl() {
     segmentedControl.selectedSegmentIndex = 0
     segmentedControl.selectedSegmentTintColor = UIColor(red: 217/255, green: 69/255, blue: 81/255, alpha: 0.5)
     segmentedControl.addTarget(self, action: #selector(categoryChanged(_:)), for: .valueChanged)
@@ -154,10 +159,13 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
       return UITableViewCell()
     }
     cell.itemNameLabel.text = nameData[indexPath.row]
-    cell.countLabel.text = "1"
+
+    cell.countLabel.text = String(countData[indexPath.row])
+    
+    
     cell.plusButton.tag = indexPath.row
     cell.minusButton.tag = indexPath.row
-    cell.payLabel.text = priceData[indexPath.row]
+    cell.payLabel.text = String(priceData[indexPath.row])
     cell.delegate = self
     return cell
   }
@@ -230,18 +238,29 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     return menuData.koreanName[name]!
   }
   
-  func sumCountLabel(in cell: CustomTableViewCell) {
+  func plusButtonTap(in cell: CustomTableViewCell) {
     var sum = 0
+    var paySum = 0
     for row in 0..<nameData.count {
       if let cell = tableView.cellForRow(at: IndexPath(row: row, section: 0)) as? CustomTableViewCell,
-         let countText = cell.countLabel.text, let count = Int(countText) {
-        sum += count
+         let countText = cell.itemNameLabel.text, let pay = cell.payLabel.text{
+          for i in 0..<nameData.count{
+            if nameData[i] == countText{
+              var count = Int(countData[i])
+              countData[i] += 1
+              //paySum = Int(pay)!
+              sum = countData[i]
+              priceData[i] = (priceData[i] / count) * (count + 1)
+              paySum = priceData.reduce(0, +)
+            }
+          }
       }
     }
     allCount.text = String(sum)
+    payLabel.text = String(paySum)
   }
   
-  func sumPayLabel(in cell: CustomTableViewCell) {
+  func minusButtonTap(in cell: CustomTableViewCell) {
     var sum = 0
     for row in 0..<nameData.count {
       if let cell = tableView.cellForRow(at: IndexPath(row: row, section: 0)) as? CustomTableViewCell,
