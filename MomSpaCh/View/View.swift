@@ -69,8 +69,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   /// setSegmentedControl: UISegmentedControl을 설정하고 초기 선택 색상을 지정하는 메서드
   private func setSegmentedControl() {
     segmentedControl.selectedSegmentIndex = 0
-//    segmentedControl.backgroundColor = UIColor(red: 217/255, green: 69/255, blue: 81/255, alpha: 0.5)
-//    segmentedControl.selectedSegmentTintColor = UIColor.white
     segmentedControl.selectedSegmentTintColor = UIColor(red: 217/255, green: 69/255, blue: 81/255, alpha: 0.5)
     segmentedControl.addTarget(self, action: #selector(categoryChanged(_:)), for: .valueChanged)
     view.addSubview(segmentedControl)
