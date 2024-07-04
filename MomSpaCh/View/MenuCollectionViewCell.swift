@@ -7,39 +7,37 @@
 
 import UIKit
 
+import SnapKit
+
 class MenuCollectionViewCell: UICollectionViewCell {
   let menuData = Data()
   static let identifier = "cell"
   
   private let menuButton: UIButton = {
     var menuButton = UIButton()
+    menuButton.backgroundColor = .systemBackground
     return menuButton
   }()
   
   private let priceLabel: UILabel = {
-    var cellLabel = UILabel()
-    return cellLabel
+    var priceLabel = UILabel()
+    priceLabel.font = UIFont.boldSystemFont(ofSize: 15)
+    priceLabel.textColor = .systemPink
+    return priceLabel
   }()
   
   private let nameLabel: UILabel = {
     var nameLabel = UILabel()
     nameLabel.font = UIFont.boldSystemFont(ofSize: 15)
+    nameLabel.textColor = .systemRed
     return nameLabel
   }()
   
   override init(frame: CGRect) {
     super.init(frame: frame)
-    setimageView()
-    setMenuLabel()
-    addSubview(nameLabel)
+    [menuButton, priceLabel, nameLabel].forEach { contentView.addSubview($0) }
     setConstraints()
-    if let image = menuData.foodMenu["burger"]?.keys.first {
-      menuButton.setImage(image, for: .normal)
-    }
     
-    if let price = menuData.foodMenu["burger"]?.values.first {
-      priceLabel.text = String(price)
-    }
     nameLabel.text = "이름"
     menuButton.addTarget(self, action: #selector(buttonClicked), for: .touchUpInside)
   }
@@ -49,31 +47,24 @@ class MenuCollectionViewCell: UICollectionViewCell {
     fatalError("init(coder:) has not been implemented")
   }
   
-  func setimageView() {
-    addSubview(menuButton)
-    menuButton.backgroundColor = .systemBackground
-  }
-  
-  func setMenuLabel() {
-    addSubview(priceLabel)
-    priceLabel.text = "가격"
-    priceLabel.font = UIFont.boldSystemFont(ofSize: 15)
-  }
-  
   func setConstraints() {
     menuButton.snp.makeConstraints { make in
-      make.top.bottom.equalToSuperview().inset(20)
+      make.top.equalToSuperview().inset(10)
       make.leading.trailing.equalToSuperview()
+      make.height.equalTo(100)
     }
     
     nameLabel.snp.makeConstraints { make in
       make.top.equalTo(menuButton.snp.bottom).offset(5)
-      make.leading.equalToSuperview().inset(40)
+      make.leading.trailing.equalToSuperview().inset(10)
+      make.height.equalTo(15)
+      
     }
     
     priceLabel.snp.makeConstraints { make in
       make.top.equalTo(nameLabel.snp.bottom).offset(5)
-      make.leading.equalToSuperview().inset(40)
+      make.leading.trailing.equalToSuperview().inset(10)
+      make.height.equalTo(15)
     }
   }
   
