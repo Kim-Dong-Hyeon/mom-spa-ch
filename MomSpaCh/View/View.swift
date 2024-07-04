@@ -9,7 +9,7 @@ import UIKit
 
 import SnapKit
 
-class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, CustomTableViewCellDelegate, UICollectionViewDelegate{
+class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, CustomTableViewCellDelegate, UICollectionViewDelegate,MenuCollectionViewCellDelegate{
 
   let menuData = Data()
   private let tableView = UITableView()
@@ -36,8 +36,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     
     self.menuCollectionView.dataSource = self
     self.menuCollectionView.delegate = self
-    self.menuCollectionView.register(MenuCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
-    
+    //self.menuCollectionView.register(MenuCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+    self.menuCollectionView.register(MenuCollectionViewCell.self, forCellWithReuseIdentifier: MenuCollectionViewCell.identifier)
     setSegmentedControl()
     setupButtonsStackView()
     setCollectionView()
@@ -61,16 +61,26 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     setupButtonsStackView()
 
   }
-  var data: [String] = []
+  var nameData: [String] = []
+  var priceData: [String] = []
   
-  @objc func testMethod(){
-    test = String( Int(test)! + 1 )
-    data.append(test)
-    print(data)
+  func addOrderList(_ pay: String, _ name: String){
+    nameData.append(name)
+    priceData.append(pay)
+    allCount.text = String(nameData.count)
+    payLabel.text = sumOfArray(priceData)
     tableView.reloadData()
-    
   }
   
+  func sumOfArray(_ array: [String]) -> String {
+      var sum = 0
+      for string in array {
+          if let number = Int(string) {
+              sum += number
+          }
+      }
+      return String(sum)
+  }
   /// setSegmentedControl: UISegmentedControl을 설정하고 초기 선택 색상을 지정하는 메서드
   private func setSegmentedControl() {
     segmentedControl.selectedSegmentIndex = 0
@@ -102,17 +112,17 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
     scrollView.backgroundColor = .brown
     allCount.backgroundColor = .yellow
-    allCount.text = "test1"
-    payLabel.text = "test2"
+    allCount.text = ""
+    payLabel.text = ""
     payLabel.backgroundColor = .yellow
     view.addSubview(scrollView)
     view.addSubview(allCount)
     view.addSubview(payLabel)
     
     scrollView.snp.makeConstraints {
-      $0.height.equalTo(180)
+      $0.height.equalTo(130)
       $0.leading.equalToSuperview().inset(20)
-      $0.bottom.equalToSuperview().inset(70)
+      $0.bottom.equalToSuperview().inset(100)
       $0.trailing.equalToSuperview().inset(100)
     }
     allCount.snp.makeConstraints {
@@ -140,18 +150,18 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   }
   
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return data.count
+    return nameData.count
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     guard let cell = tableView.dequeueReusableCell(withIdentifier: "CustomCell", for: indexPath) as? CustomTableViewCell else {
       return UITableViewCell()
     }
-    cell.itemNameLabel.text = data[indexPath.row]
+    cell.itemNameLabel.text = nameData[indexPath.row]
     cell.countLabel.text = "1"
     cell.plusButton.tag = indexPath.row
     cell.minusButton.tag = indexPath.row
-    cell.payLabel.text = "10000"
+    cell.payLabel.text = priceData[indexPath.row]
     cell.delegate = self
     return cell
   }
@@ -159,7 +169,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   func didTapDeleteButton(in cell: CustomTableViewCell) {
     if let indexPath = tableView.indexPath(for: cell) {
       print(indexPath.row)
-      data.remove(at: indexPath.row)
+      nameData.remove(at: indexPath.row)
+      priceData.remove(at: indexPath.row)
       tableView.deleteRows(at: [indexPath], with: .automatic)
     }
   }
@@ -178,7 +189,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   
   func sumCountLabel(in cell: CustomTableViewCell) {
     var sum = 0
-    for row in 0..<data.count {
+    for row in 0..<nameData.count {
       if let cell = tableView.cellForRow(at: IndexPath(row: row, section: 0)) as? CustomTableViewCell,
          let countText = cell.countLabel.text, let count = Int(countText) {
         sum += count
@@ -189,7 +200,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   
   func sumPayLabel(in cell: CustomTableViewCell) {
     var sum = 0
-    for row in 0..<data.count {
+    for row in 0..<nameData.count {
       if let cell = tableView.cellForRow(at: IndexPath(row: row, section: 0)) as? CustomTableViewCell,
          let countText = cell.payLabel.text, let count = Int(countText) {
         sum += count
@@ -299,11 +310,9 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
       menuData.drinkPrice.forEach { allItemPrice.append($0) }
       
       cell.configure(withImageName: allItemName[indexPath.item], price: allItemPrice[indexPath.item], name: changeName(allItemName[indexPath.item]))
+      
     }
-    
-//    let item = menuData.burger[indexPath.item]
-//    cell.configure(withImageName: item, price: menuData.burgerPrice[indexPath.item], name: changeName(item))
-    
+    cell.delegate = self
     return cell
   }
   
