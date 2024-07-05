@@ -128,8 +128,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     allCount.layer.borderWidth = 1.0
     allCount.layer.borderColor = UIColor.red.cgColor
     allCount.textAlignment = .center
-    allCount.text = ""
-    payLabel.text = ""
+    allCount.text = "0"
+    payLabel.text = "0"
     payLabel.adjustsFontSizeToFitWidth = true
     payLabel.layer.borderWidth = 1.0
     payLabel.textAlignment = .center
