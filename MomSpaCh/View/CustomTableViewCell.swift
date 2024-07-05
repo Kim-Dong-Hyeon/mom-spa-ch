@@ -10,7 +10,7 @@ import UIKit
 import SnapKit
 
 protocol CustomTableViewCellDelegate: AnyObject {
-  func didTapDeleteButton(in cell: CustomTableViewCell)
+  func deleteButton(in cell: CustomTableViewCell)
   func plusButtonTap(in cell: CustomTableViewCell)
   func minusButtonTap(in cell: CustomTableViewCell)
 }
@@ -74,7 +74,8 @@ class CustomTableViewCell: UITableViewCell {
     // SnapKit을 사용하여 레이아웃 설정
     plusButton.snp.makeConstraints {
         //make.trailing.equalTo(countLabel.snp.leading).inset(50)
-      $0.leading.equalTo(itemNameLabel.snp.trailing).offset(20)
+      //$0.leading.equalTo(itemNameLabel.snp.trailing).offset(20)
+      $0.centerX.equalTo(contentView.snp.centerX).offset(-5)
       $0.centerY.equalToSuperview()
       $0.height.equalTo(20)
       $0.width.equalTo(20)
@@ -83,13 +84,15 @@ class CustomTableViewCell: UITableViewCell {
     minusButton.snp.makeConstraints {
         //make.trailing.equalToSuperview().offset(-5)
       $0.centerY.equalToSuperview()
+      $0.centerX.equalTo(contentView.snp.centerX).offset(35)
       $0.height.equalTo(20)
       $0.width.equalTo(20)
     }
     
     countLabel.snp.makeConstraints {
-      $0.leading.equalTo(plusButton.snp.trailing).offset(5)
-      $0.trailing.equalTo(minusButton.snp.leading).offset(-5)
+      //$0.leading.equalTo(plusButton.snp.trailing).offset(5)
+      //$0.trailing.equalTo(minusButton.snp.leading).offset(-5)
+      $0.centerX.equalTo(contentView.snp.centerX).offset(15)
       $0.centerY.equalToSuperview()
       $0.height.equalTo(20)
     }
@@ -97,6 +100,7 @@ class CustomTableViewCell: UITableViewCell {
       $0.height.equalTo(20)
       //$0.trailing.equalTo(plusButton.snp.leading).inset(30)
       $0.centerY.equalToSuperview()
+      $0.leading.equalTo(contentView.snp.leading).inset(10)
     }
     payLabel.snp.makeConstraints {
       $0.centerY.equalToSuperview()
@@ -119,7 +123,7 @@ class CustomTableViewCell: UITableViewCell {
         if let payText = payLabel.text, let pay = Int(payText) {
           if String((pay / count) * (count - 1)) == "0" {
             print("삭제")
-            delegate?.didTapDeleteButton(in: self)
+            delegate?.deleteButton(in: self)
             
           } else {
             print("정상")

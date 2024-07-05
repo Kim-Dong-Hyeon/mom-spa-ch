@@ -6,12 +6,12 @@
 //
 
 import UIKit
-
 import SnapKit
 
 class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, 
                         CustomTableViewCellDelegate, UICollectionViewDelegate,MenuCollectionViewCellDelegate {
-  
+  let menuData = Data()
+  private let tableView = UITableView()
   static let identifier = "mainViewController"
   private let allCount = UILabel()
   private let button = UIButton()
@@ -23,17 +23,20 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   )
   private let nameLabel = UILabel()
   private let payLabel = UILabel()
+  private let productNameLabel = UILabel()
+  private let quantityLabel = UILabel()
+  private let amount = UILabel()
+  private let orderQuantity = UILabel()
+  private let totalAmount = UILabel()
+  private let stackView = UIStackView()
   private let scrollView = UIScrollView()
   private let segmentedControl = UISegmentedControl(items: ["전체", "버거", "치킨", "사이드", "음료"])
-  private let tableView = UITableView()
   let logo : UIImageView = {
     let logo = UIImageView()
     logo.image = UIImage(named: "logo")
     logo.contentMode = .scaleAspectFit
     return logo
   }()
-  let menuData = Data()
-  var test = "0"
   var selectedCategory = "전체"
   
   override func viewDidLoad() {
@@ -110,44 +113,72 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     menuCollectionView.reloadData()
   }
   
+
   // Constraints 묶어야 함
   func setupTableView() {
-    tableView.backgroundColor = .blue
     tableView.dataSource = self
     tableView.delegate = self
     tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-    scrollView.backgroundColor = .brown
-    allCount.backgroundColor = .yellow
+    tableView.layer.borderWidth = 1.0
+    tableView.layer.borderColor = UIColor.red.cgColor
+    allCount.layer.borderWidth = 1.0
+    allCount.layer.borderColor = UIColor.red.cgColor
+    allCount.textAlignment = .center
     allCount.text = ""
     payLabel.text = ""
-    payLabel.backgroundColor = .yellow
+    payLabel.layer.borderWidth = 1.0
+    payLabel.textAlignment = .center
+    payLabel.layer.borderColor = UIColor.red.cgColor
     
-    scrollView.snp.makeConstraints {
+    productNameLabel.text = "제품명"
+    quantityLabel.text = "수량"
+    amount.text = "금액"
+    orderQuantity.text = "주문수량"
+    totalAmount.text = "합계금액"
+    stackView.addArrangedSubview(productNameLabel)
+    stackView.addArrangedSubview(quantityLabel)
+    stackView.addArrangedSubview(amount)
+    stackView.spacing = 70
+    view.addSubview(tableView)
+    view.addSubview(allCount)
+    view.addSubview(payLabel)
+    view.addSubview(stackView)
+    view.addSubview(orderQuantity)
+    view.addSubview(totalAmount)
+    
+    tableView.snp.makeConstraints {
       $0.height.equalTo(130)
       $0.leading.equalToSuperview().inset(20)
       $0.bottom.equalToSuperview().inset(100)
-      $0.trailing.equalToSuperview().inset(100)
+      $0.trailing.equalToSuperview().inset(80)
     }
     allCount.snp.makeConstraints {
-      $0.leading.equalTo(scrollView.snp.trailing).offset(10)
-      $0.centerY.equalTo(scrollView.snp.top).offset(20)
+      $0.leading.equalTo(tableView.snp.trailing).offset(10)
+      $0.centerY.equalTo(tableView.snp.top).offset(15)
+      $0.height.equalTo(30)
+      $0.width.equalTo(60)
     }
     payLabel.snp.makeConstraints {
-      $0.leading.equalTo(scrollView.snp.trailing).offset(10)
-      $0.centerY.equalTo(scrollView.snp.top).offset(80)
+      $0.leading.equalTo(tableView.snp.trailing).offset(10)
+      $0.centerY.equalTo(tableView.snp.top).offset(90)
+      $0.height.equalTo(30)
+      $0.width.equalTo(60)
+    }
+    stackView.snp.makeConstraints {
+      $0.bottom.equalTo(tableView.snp.top).offset(-10)
+      $0.centerX.equalTo(tableView.snp.centerX)
+    }
+    orderQuantity.snp.makeConstraints {
+      $0.bottom.equalTo(allCount.snp.top).offset(-10)
+      $0.centerX.equalTo(allCount.snp.centerX)
+    }
+    totalAmount.snp.makeConstraints {
+      $0.bottom.equalTo(payLabel.snp.top).offset(-10)
+      $0.centerX.equalTo(payLabel.snp.centerX)
     }
     
     tableView.register(CustomTableViewCell.self, forCellReuseIdentifier: "CustomCell") // 셀 등록
-    
-    // 테이블 뷰 ScrollView에 추가 및 SnapKit을 사용한 제약 조건 설정
-    scrollView.addSubview(tableView)
-    tableView.snp.makeConstraints {
-      $0.edges.equalToSuperview()
-      $0.width.equalToSuperview()
-      $0.height.equalToSuperview()
-      $0.bottom.equalToSuperview()
-      $0.trailing.equalToSuperview()
-    }
+
   }
   
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -170,12 +201,15 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     return cell
   }
   
-  func didTapDeleteButton(in cell: CustomTableViewCell) {
+  func deleteButton(in cell: CustomTableViewCell) {
     if let indexPath = tableView.indexPath(for: cell) {
       print(indexPath.row)
       nameData.remove(at: indexPath.row)
       priceData.remove(at: indexPath.row)
+      countData.remove(at: indexPath.row)
       tableView.deleteRows(at: [indexPath], with: .automatic)
+      allCount.text = String(countData.reduce(0, +))
+      payLabel.text = String(priceData.reduce(0, +))
     }
   }
   
@@ -239,36 +273,56 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   }
   
   func plusButtonTap(in cell: CustomTableViewCell) {
+    guard let indexPath = tableView.indexPath(for: cell) else {
+        return
+    }
     var sum = 0
     var paySum = 0
-    for row in 0..<nameData.count {
-      if let cell = tableView.cellForRow(at: IndexPath(row: row, section: 0)) as? CustomTableViewCell,
-         let countText = cell.itemNameLabel.text, let pay = cell.payLabel.text{
+    
+      if let cell = tableView.cellForRow(at: indexPath) as? CustomTableViewCell,
+         let countText = cell.itemNameLabel.text{
+        print(countText)
           for i in 0..<nameData.count{
             if nameData[i] == countText{
-              var count = Int(countData[i])
+              let count = Int(countData[i])
               countData[i] += 1
-              //paySum = Int(pay)!
-              sum = countData[i]
+              sum = countData.reduce(0, +)
+              print(countData)
               priceData[i] = (priceData[i] / count) * (count + 1)
               paySum = priceData.reduce(0, +)
             }
           }
       }
-    }
+    
     allCount.text = String(sum)
     payLabel.text = String(paySum)
   }
   
   func minusButtonTap(in cell: CustomTableViewCell) {
     var sum = 0
-    for row in 0..<nameData.count {
-      if let cell = tableView.cellForRow(at: IndexPath(row: row, section: 0)) as? CustomTableViewCell,
-         let countText = cell.payLabel.text, let count = Int(countText) {
-        sum += count
-      }
+    var paySum = 0
+    guard let indexPath = tableView.indexPath(for: cell) else {
+        return
     }
-    payLabel.text = String(sum)
+    print(indexPath.row)
+    if let cell = tableView.cellForRow(at: indexPath) as? CustomTableViewCell,
+       let countText = cell.itemNameLabel.text{
+      
+      for i in 0..<nameData.count{
+        if nameData[i] == countText{
+          let count = Int(countData[i])
+          countData[i] -= 1
+          sum = countData.reduce(0, +)
+          priceData[i] = (priceData[i] / count) * (count - 1)
+          paySum = priceData.reduce(0, +)
+        }
+      }
+      
+      allCount.text = String(sum)
+      payLabel.text = String(paySum)
+    }
+    
+    
   }
   
   private func setupButtonsStackView() {
