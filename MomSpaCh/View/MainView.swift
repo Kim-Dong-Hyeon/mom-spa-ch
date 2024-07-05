@@ -34,6 +34,19 @@ class MainView: UIView {
     return logo
   }()
   
+  let searchTextField: UITextField = {
+    let textField = UITextField()
+    textField.placeholder = "메뉴 검색"
+    textField.borderStyle = .roundedRect
+    return textField
+  }()
+  
+  let searchButton: UIButton = {
+    let button = UIButton(type: .system)
+    button.setImage(UIImage(systemName: "magnifyingglass"), for: .normal)
+    return button
+  }()
+  
   let segmentedControl = UISegmentedControl(items: ["전체", "버거", "치킨", "사이드", "음료"])
   
   let menuCollectionView: UICollectionView = {
@@ -47,6 +60,7 @@ class MainView: UIView {
     self.backgroundColor = .systemBackground
     configureUI()
     logoConstraints()
+    setupSearchUI()
     setupSegmentedControl()
     setupSegmentedControlConstraints()
     setupCollectionViewConstraint()
@@ -61,7 +75,7 @@ class MainView: UIView {
   }
   
   func configureUI() {
-    [logo,segmentedControl, menuCollectionView, stackView, tableView, allCount, payLabel, tableView, orderQuantity, totalAmount].forEach { self.addSubview($0)}
+    [logo, searchTextField, searchButton, segmentedControl, menuCollectionView, stackView, tableView, allCount, payLabel, tableView, orderQuantity, totalAmount].forEach { self.addSubview($0)}
     [productNameLabel, quantityLabel, amount].forEach {stackView.addArrangedSubview($0)}
   }
   
@@ -71,6 +85,20 @@ class MainView: UIView {
       $0.height.equalTo(40)
       $0.leading.equalTo(self.safeAreaLayoutGuide.snp.leading).offset(20)
       $0.bottom.equalTo(self.safeAreaLayoutGuide.snp.top).offset(40)
+    }
+  }
+  
+  func setupSearchUI() {
+    searchTextField.snp.makeConstraints {
+      $0.leading.equalTo(logo.snp.trailing).offset(10)
+      $0.centerY.equalTo(logo.snp.centerY)
+      $0.height.equalTo(40)
+    }
+    
+    searchButton.snp.makeConstraints {
+      $0.leading.equalTo(searchTextField.snp.trailing).offset(10)
+      $0.centerY.equalTo(searchTextField.snp.centerY)
+      $0.trailing.equalTo(self.safeAreaLayoutGuide.snp.trailing).offset(-20)
     }
   }
   

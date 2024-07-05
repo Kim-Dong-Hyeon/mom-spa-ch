@@ -16,6 +16,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   
   var checkDuplication: Bool = false
   var menuData = MenuData()
+  var filteredMenuData: [MenuItem] = []
   static let identifier = "mainViewController"
   private let countLabel = UILabel()
   private let nameLabel = UILabel()
@@ -34,7 +35,30 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     super.viewDidLoad()
     setupTableView()
     setupCollectionView()
+    mainView.searchButton.addTarget(self, action: #selector(searchButtonTapped), for: .touchUpInside)
     mainView.segmentedControl.addTarget(self, action: #selector(categoryChanged(_:)), for: .valueChanged)
+    filteredMenuData = menuData.menuArray
+  }
+  
+  @objc private func searchButtonTapped() {
+    let searchText = mainView.searchTextField.text ?? ""
+    
+    if searchText.isEmpty {
+      filteredMenuData = menuData.menuArray
+    } else {
+      filteredMenuData = menuData.menuArray.filter { menuItem in
+        if searchText.range(of: "\\p{Hangul}", options: .regularExpression) != nil {
+          // 검색어에 한글이 포함된 경우 menuName과 비교
+          let containsMenuName = menuItem.menuName.contains(searchText)
+          return containsMenuName
+        } else {
+          // 검색어에 한글이 포함되지 않은 경우 imageName과 비교
+          let containsImageName = menuItem.imageName.lowercased().contains(searchText.lowercased())
+          return containsImageName
+        }
+      }
+    }
+    mainView.menuCollectionView.reloadData()
   }
   
   // View or Controller 정하기
@@ -98,7 +122,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 //      let item = menuData.menuArray[indexPath.row]
 //      cell.configure(withImageName: item.imageName, price: item.menuPrice, name: item.menuName)
 //    }
-    let filteredMenu = menuData.menuArray.filter {
+    let filteredMenu = filteredMenuData.filter {
       mainView.selectedCategory == "all" || $0.category == mainView.selectedCategory
     }
     let item = filteredMenu[indexPath.item]
@@ -126,7 +150,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 //    default:
 //      return menuData.menuArray.count
 //    }
-    let filteredMenu = menuData.menuArray.filter { mainView.selectedCategory == "all" || $0.category == mainView.selectedCategory }
+    let filteredMenu = filteredMenuData.filter { mainView.selectedCategory == "all" || $0.category == mainView.selectedCategory }
     
     return filteredMenu.count
   }
