@@ -19,50 +19,52 @@ class CustomTableViewCell: UITableViewCell {
   weak var delegate: CustomTableViewCellDelegate?
   
   let plusButton: UIButton = {
-      let button = UIButton(type: .system)
-      button.setTitle("+", for: .normal)
-      button.backgroundColor = .lightGray
-      button.setTitleColor(.white, for: .normal)
-      return button
-  }()
-
-  let minusButton: UIButton = {
-      let button = UIButton(type: .system)
-      button.setTitle("-", for: .normal)
-      button.backgroundColor = .lightGray
-      button.setTitleColor(.white, for: .normal)
-      return button
-  }()
-
-  let countLabel: UILabel = {
-      let label = UILabel()
-      label.text = "1"
-      label.textAlignment = .center
-      return label
-  }()
-  let itemNameLabel: UILabel = {
-      let label = UILabel()
-      label.text = ""
-      label.textAlignment = .center
-      return label
-  }()
-  let payLabel: UILabel = {
-      let label = UILabel()
-      label.text = ""
-      label.textAlignment = .center
-      return label
-  }()
-  let wonLabel: UILabel = {
-      let label = UILabel()
-      label.text = "원"
-      label.textAlignment = .center
-      return label
+    let button = UIButton(type: .system)
+    button.setTitle("+", for: .normal)
+    button.backgroundColor = .lightGray
+    button.setTitleColor(.white, for: .normal)
+    return button
   }()
   
+  let minusButton: UIButton = {
+    let button = UIButton(type: .system)
+    button.setTitle("-", for: .normal)
+    button.backgroundColor = .lightGray
+    button.setTitleColor(.white, for: .normal)
+    return button
+  }()
+  
+  let countLabel: UILabel = {
+    let label = UILabel()
+    label.text = "1"
+    label.textAlignment = .center
+    return label
+  }()
+  let itemNameLabel: UILabel = {
+    let label = UILabel()
+    label.text = ""
+    label.textAlignment = .center
+    return label
+  }()
+  let payLabel: UILabel = {
+    let label = UILabel()
+    label.text = ""
+    label.textAlignment = .center
+    return label
+  }()
+  let wonLabel: UILabel = {
+    let label = UILabel()
+    label.text = "원"
+    label.textAlignment = .center
+    return label
+  }()
+  
+  /// init : UITabelViewCell 초기화 메서드 재정의
+  /// - Parameters:
+  ///   - style: UITabelViewCell의 스타일을 지정하는 파라미터
+  ///   - reuseIdentifier: UITableViewCell의 재사용 식별자
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
-    
-    // contentView에 서브뷰 추가
     contentView.addSubview(plusButton)
     contentView.addSubview(minusButton)
     contentView.addSubview(countLabel)
@@ -70,11 +72,16 @@ class CustomTableViewCell: UITableViewCell {
     contentView.addSubview(payLabel)
     contentView.addSubview(wonLabel)
     
+    createConstraint()
     
-    // SnapKit을 사용하여 레이아웃 설정
+    plusButton.addTarget(self, action: #selector(tappedPlusButton), for: .touchDown)
+    minusButton.addTarget(self, action: #selector(tappedMinusButton), for: .touchDown)
+  }
+  
+  ///createConstraint : UI 제약조건 설정
+  ///Developer : 백시훈
+  private func createConstraint(){
     plusButton.snp.makeConstraints {
-        //make.trailing.equalTo(countLabel.snp.leading).inset(50)
-      //$0.leading.equalTo(itemNameLabel.snp.trailing).offset(20)
       $0.centerX.equalTo(contentView.snp.centerX).offset(-5)
       $0.centerY.equalToSuperview()
       $0.height.equalTo(20)
@@ -82,7 +89,6 @@ class CustomTableViewCell: UITableViewCell {
     }
     
     minusButton.snp.makeConstraints {
-        //make.trailing.equalToSuperview().offset(-5)
       $0.centerY.equalToSuperview()
       $0.centerX.equalTo(contentView.snp.centerX).offset(35)
       $0.height.equalTo(20)
@@ -90,31 +96,29 @@ class CustomTableViewCell: UITableViewCell {
     }
     
     countLabel.snp.makeConstraints {
-      //$0.leading.equalTo(plusButton.snp.trailing).offset(5)
-      //$0.trailing.equalTo(minusButton.snp.leading).offset(-5)
       $0.centerX.equalTo(contentView.snp.centerX).offset(15)
       $0.centerY.equalToSuperview()
       $0.height.equalTo(20)
     }
     itemNameLabel.snp.makeConstraints {
       $0.height.equalTo(20)
-      //$0.trailing.equalTo(plusButton.snp.leading).inset(30)
       $0.centerY.equalToSuperview()
       $0.leading.equalTo(contentView.snp.leading).inset(10)
     }
+    
     payLabel.snp.makeConstraints {
       $0.centerY.equalToSuperview()
       $0.leading.equalTo(minusButton.snp.trailing).offset(20)
     }
+    
     wonLabel.snp.makeConstraints {
       $0.centerY.equalToSuperview()
-      $0.leading.equalTo(payLabel.snp.trailing).offset(5)
+      $0.trailing.lessThanOrEqualTo(contentView.snp.trailing).inset(10)
     }
-    plusButton.addTarget(self, action: #selector(tappedPlusButton), for: .touchDown)
-    minusButton.addTarget(self, action: #selector(tappedMinusButton), for: .touchDown)
   }
   
-  
+  /// tappedMinusButton : minus버튼 클릭시 이벤트
+  /// Developer : 백시훈
   @objc func tappedMinusButton() {
     if let countText = countLabel.text, let count = Int(countText) {
       
@@ -136,6 +140,8 @@ class CustomTableViewCell: UITableViewCell {
     }
   }
   
+  /// tappedPlusButton : plus버튼을 클릭했을때 이벤트
+  /// Developer : 백시훈
   @objc func tappedPlusButton() {
     if let countText = countLabel.text, let count = Int(countText) {
       countLabel.text = String(count + 1)
@@ -143,11 +149,12 @@ class CustomTableViewCell: UITableViewCell {
         payLabel.text = String((pay / count) * (count + 1))
       }
       delegate?.plusButtonTap(in: self)
-      //delegate?.sumPayLabel(in: self)
     }
   }
   
+  /// init? : 디코딩을 위한 초기화 메서드 필수 구현
+  /// - Parameter coder: 객체를 인코딩하고 디코딩하는 역할
   required init?(coder: NSCoder) {
-      fatalError("init(coder:) has not been implemented")
+    fatalError("Error")
   }
 }
