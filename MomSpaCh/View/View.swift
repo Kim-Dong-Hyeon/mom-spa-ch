@@ -349,8 +349,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     let button = UIButton(type: .system)
     button.setTitle("주문하기", for: .normal)
     button.titleLabel?.font = UIFont(name: "HelveticaNeue-Bold", size: 20)
-    button.backgroundColor = UIColor(red: 235/255, green: 51/255, blue: 77/255, alpha: 1.0)
-    button.setTitleColor(.white, for: .normal)
+    button.backgroundColor = UIColor(named: "signatureColor")
+    button.setTitleColor(UIColor(named: "orderButtonTitle"), for: .normal)
     button.layer.cornerRadius = 5
     
     button.addTarget(self, action: #selector(orderButtonTapped), for: .touchUpInside)
@@ -361,38 +361,51 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     let button = UIButton(type: .system)
     button.setTitle("취소", for: .normal)
     button.titleLabel?.font = UIFont(name: "HelveticaNeue-Bold", size: 20)
-    button.backgroundColor = .white
-    button.setTitleColor(UIColor(red: 235/255, green: 51/255, blue: 77/255, alpha: 1.0), for: .normal)
+    button.backgroundColor = UIColor(named: "cancleButtonBackground")
+    button.setTitleColor(UIColor(named: "signatureColor"), for: .normal)
     button.layer.borderWidth = 1
-    button.layer.borderColor = UIColor(red: 235/255, green: 51/255, blue: 77/255, alpha: 1.0).cgColor
+    button.layer.borderColor = UIColor(named: "signatureColor")?.cgColor
     button.layer.cornerRadius = 5
     
-    //button.addTarget(self, action: #selector(), for: .touchUpInside) 취소 눌렀을 때 동작 추가 예정
+    button.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
     return button
   }
-  
+  func orderListClear() {
+    nameData = []
+    priceData = []
+    countData = []
+    allCount.text = ""
+    payLabel.text = ""
+    tableView.reloadData()
+  }
   @objc private func cancelButtonTapped() {
-    // 아니오 눌렀을 때 동작 추가 예정
+    orderListClear()
   }
   
   @objc private func orderButtonTapped() {
-    // 최종 금액 추가 예정
-    let alert = UIAlertController(title: "최종 결제 금액 원입니다. 주문하시겠습니까?", message: "", preferredStyle: .alert)
-    let yesAction = UIAlertAction(title: "네", style: .default) { _ in
-      self.orderCompletedAlert()
+    if nameData.isEmpty {
+      let emptyAlert = UIAlertController(title: "주문내역을 확인해 주십시오", message: "", preferredStyle: .alert)
+      let okAction = UIAlertAction(title: "확인", style: .default, handler: nil)
+      emptyAlert.addAction(okAction)
+      present(emptyAlert, animated: true, completion: nil)
+    } else {
+      let alert = UIAlertController(title: "최종 결제 금액 \(payLabel.text!)원입니다. 주문하시겠습니까?", message: "", preferredStyle: .alert)
+      let yesAction = UIAlertAction(title: "네", style: .default) { _ in
+        self.orderCompletedAlert()
+      }
+      let noAction = UIAlertAction(title: "아니오", style: .cancel, handler: nil)
+      alert.addAction(yesAction)
+      alert.addAction(noAction)
+      
+      present(alert, animated: true, completion: nil)
     }
-    let noAction = UIAlertAction(title: "아니오", style: .cancel, handler: nil)
-    alert.addAction(yesAction)
-    alert.addAction(noAction)
-    
-    present(alert, animated: true, completion: nil)
   }
   
   private func orderCompletedAlert() {
     let completedAlert = UIAlertController(title: "주문 완료되었습니다.", message: "", preferredStyle: .alert)
     let okAction = UIAlertAction(title: "확인", style: .default, handler: nil)
     completedAlert.addAction(okAction)
-    
+    orderListClear()
     present(completedAlert, animated: true, completion: nil)
   }
 }
