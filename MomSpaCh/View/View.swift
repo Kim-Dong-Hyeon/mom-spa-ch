@@ -10,12 +10,14 @@ import UIKit
 import SnapKit
 
 class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate,
-                        CustomTableViewCellDelegate, UICollectionViewDelegate,
+                      CustomTableViewCellDelegate, UICollectionViewDelegate,
                       MenuCollectionViewCellDelegate, UICollectionViewDataSource,
                       UICollectionViewDelegateFlowLayout {
-  let menuData = MenuData()
-  private let tableView = UITableView()
+  var menuData = MenuData()
+  var selectedCategory = "전체"
+  var checkDuplication: Bool = false
   static let identifier = "mainViewController"
+  private let tableView = UITableView()
   private let allCount = UILabel()
   private let button = UIButton()
   private let countLabel = UILabel()
@@ -40,24 +42,20 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     logo.contentMode = .scaleAspectFit
     return logo
   }()
-  var selectedCategory = "전체"
   
   override func viewDidLoad() {
     super.viewDidLoad()
     
     view.backgroundColor = .systemBackground
     
-    [logo, segmentedControl, scrollView, allCount, payLabel, menuCollectionView].forEach {
+    [logo, segmentedControl, scrollView, allCount, payLabel, menuCollectionView, tableView,
+     allCount, payLabel, stackView, orderQuantity, totalAmount].forEach {
       view.addSubview( $0 )
     }
+
+    [productNameLabel, quantityLabel, amount].forEach { stackView.addArrangedSubview($0) }
     
-    logo.snp.makeConstraints {
-      $0.width.equalTo(120)
-      $0.height.equalTo(40)
-      $0.top.equalToSuperview().inset(60)
-      $0.leading.equalToSuperview().inset(20)
-    }
-    
+    logoConstraints()
     setupTableView()
     setupSegmentedControl()
     setupCollectionView()
@@ -66,30 +64,33 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     setupButtonsStackView()
   }
   
-  // Model 이동 예정
-  var nameData: [String] = []
-  var priceData: [Int] = []
-  var countData: [Int] = []
-  var checkDuplication: Bool = false
+  func logoConstraints() {
+    logo.snp.makeConstraints {
+      $0.width.equalTo(120)
+      $0.height.equalTo(40)
+      $0.top.equalToSuperview().inset(60)
+      $0.leading.equalToSuperview().inset(20)
+    }
+  }
+  
   func addOrderList(_ pay: String, _ name: String){
-    if nameData.contains(name){
+    if menuData.nameData.contains(name){
       checkDuplication = true//중복일때
-      for i in 0..<nameData.count{
-        if nameData[i] == name{
-          countData[i] += 1
-          priceData[i] += Int(pay)!
+      for i in 0..<menuData.nameData.count{
+        if menuData.nameData[i] == name{
+          menuData.countData[i] += 1
+          menuData.priceData[i] += Int(pay)!
         }
       }
-      print(countData.reduce(0, +))
-      allCount.text = String(countData.reduce(0, +))
-    }else{
+      allCount.text = String(menuData.countData.reduce(0, +))
+    } else {
       checkDuplication = false
-      nameData.append(name)
-      priceData.append(Int(pay)!)
-      countData.append(1)
+      menuData.nameData.append(name)
+      menuData.priceData.append(Int(pay)!)
+      menuData.countData.append(1)
     }
-    allCount.text = String(countData.reduce(0, +))
-    payLabel.text = String(priceData.reduce(0, +))
+    allCount.text = String(menuData.countData.reduce(0, +))
+    payLabel.text = String(menuData.priceData.reduce(0, +))
     tableView.reloadData()
   }
   
@@ -123,6 +124,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
     tableView.layer.borderWidth = 1.0
     tableView.layer.borderColor = UIColor.red.cgColor
+    tableView.rowHeight = 44
     allCount.layer.borderWidth = 1.0
     allCount.layer.borderColor = UIColor.red.cgColor
     allCount.textAlignment = .center
@@ -138,16 +140,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     amount.text = "금액"
     orderQuantity.text = "주문수량"
     totalAmount.text = "합계금액"
-    stackView.addArrangedSubview(productNameLabel)
-    stackView.addArrangedSubview(quantityLabel)
-    stackView.addArrangedSubview(amount)
     stackView.spacing = 70
-    view.addSubview(tableView)
-    view.addSubview(allCount)
-    view.addSubview(payLabel)
-    view.addSubview(stackView)
-    view.addSubview(orderQuantity)
-    view.addSubview(totalAmount)
     
     tableView.snp.makeConstraints {
       $0.height.equalTo(130)
@@ -179,40 +172,34 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
       $0.bottom.equalTo(payLabel.snp.top).offset(-10)
       $0.centerX.equalTo(payLabel.snp.centerX)
     }
-    
     tableView.register(CustomTableViewCell.self, forCellReuseIdentifier: "CustomCell") // 셀 등록
-    
   }
   
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return nameData.count
+    return menuData.nameData.count
   }
   
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     guard let cell = tableView.dequeueReusableCell(withIdentifier: "CustomCell", for: indexPath) as? CustomTableViewCell else {
       return UITableViewCell()
     }
-    cell.itemNameLabel.text = nameData[indexPath.row]
-    
-    cell.countLabel.text = String(countData[indexPath.row])
-    
-    
+    cell.itemNameLabel.text = menuData.nameData[indexPath.row]
+    cell.countLabel.text = String(menuData.countData[indexPath.row])
     cell.plusButton.tag = indexPath.row
     cell.minusButton.tag = indexPath.row
-    cell.payLabel.text = String(priceData[indexPath.row])
+    cell.payLabel.text = String(menuData.priceData[indexPath.row])
     cell.delegate = self
     return cell
   }
   
   func deleteButton(in cell: CustomTableViewCell) {
     if let indexPath = tableView.indexPath(for: cell) {
-      print(indexPath.row)
-      nameData.remove(at: indexPath.row)
-      priceData.remove(at: indexPath.row)
-      countData.remove(at: indexPath.row)
+      menuData.nameData.remove(at: indexPath.row)
+      menuData.priceData.remove(at: indexPath.row)
+      menuData.countData.remove(at: indexPath.row)
       tableView.deleteRows(at: [indexPath], with: .automatic)
-      allCount.text = String(countData.reduce(0, +))
-      payLabel.text = String(priceData.reduce(0, +))
+      allCount.text = String(menuData.countData.reduce(0, +))
+      payLabel.text = String(menuData.priceData.reduce(0, +))
     }
   }
   
@@ -247,7 +234,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
       return UICollectionViewCell()
     }
     
-    //    var menuItems: [String]
     switch selectedCategory {
     case "버거":
       let burgerItem = menuData.menuArray.filter {$0.category == "burger"}
@@ -283,7 +269,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     return CGSize(width: 130, height: 170)
   }
   
-  
   /// 컬렉션 뷰 내부 셀구성 개수 설정
   /// - Returns: 개수
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -305,59 +290,48 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     guard let indexPath = tableView.indexPath(for: cell) else {
       return
     }
-    var sum = 0
-    var paySum = 0
     
     if let cell = tableView.cellForRow(at: indexPath) as? CustomTableViewCell,
        let countText = cell.itemNameLabel.text{
-      print(countText)
-      for i in 0..<nameData.count{
-        if nameData[i] == countText{
-          let count = Int(countData[i])
-          countData[i] += 1
-          sum = countData.reduce(0, +)
-          print(countData)
-          priceData[i] = (priceData[i] / count) * (count + 1)
-          paySum = priceData.reduce(0, +)
+      for i in 0..<menuData.nameData.count{
+        if menuData.nameData[i] == countText{
+          let count = Int(menuData.countData[i])
+          menuData.countData[i] += 1
+          menuData.countSum = menuData.countData.reduce(0, +)
+          menuData.priceData[i] = (menuData.priceData[i] / count) * (count + 1)
+          menuData.paySum = menuData.priceData.reduce(0, +)
         }
       }
     }
-    
-    allCount.text = String(sum)
-    payLabel.text = String(paySum)
+    allCount.text = String(menuData.countSum)
+    payLabel.text = String(menuData.paySum)
   }
   
   func minusButtonTap(in cell: CustomTableViewCell) {
-    var sum = 0
-    var paySum = 0
+    
     guard let indexPath = tableView.indexPath(for: cell) else {
       return
     }
-    print(indexPath.row)
     if let cell = tableView.cellForRow(at: indexPath) as? CustomTableViewCell,
        let countText = cell.itemNameLabel.text{
       
-      for i in 0..<nameData.count{
-        if nameData[i] == countText{
-          let count = Int(countData[i])
-          countData[i] -= 1
-          sum = countData.reduce(0, +)
-          priceData[i] = (priceData[i] / count) * (count - 1)
-          paySum = priceData.reduce(0, +)
+      for i in 0..<menuData.nameData.count{
+        if menuData.nameData[i] == countText{
+          let count = Int(menuData.countData[i])
+          menuData.countData[i] -= 1
+          menuData.countSum = menuData.countData.reduce(0, +)
+          menuData.priceData[i] = (menuData.priceData[i] / count) * (count - 1)
+          menuData.paySum = menuData.priceData.reduce(0, +)
         }
       }
-      
-      allCount.text = String(sum)
-      payLabel.text = String(paySum)
+      allCount.text = String(menuData.countSum)
+      payLabel.text = String(menuData.paySum)
     }
-    
-    
   }
   
   private func setupButtonsStackView() {
     let cancelButton = createCancelButton()
     let orderButton = createOrderButton()
-    
     let stackView = UIStackView(arrangedSubviews: [cancelButton, orderButton])
     stackView.axis = .horizontal
     stackView.alignment = .fill
@@ -381,7 +355,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     button.backgroundColor = UIColor(named: "signatureColor")
     button.setTitleColor(UIColor(named: "orderButtonTitle"), for: .normal)
     button.layer.cornerRadius = 5
-    
     button.addTarget(self, action: #selector(orderButtonTapped), for: .touchUpInside)
     return button
   }
@@ -395,24 +368,25 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     button.layer.borderWidth = 1
     button.layer.borderColor = UIColor(named: "signatureColor")?.cgColor
     button.layer.cornerRadius = 5
-    
     button.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
     return button
   }
+  
   func orderListClear() {
-    nameData = []
-    priceData = []
-    countData = []
+    menuData.nameData = []
+    menuData.priceData = []
+    menuData.countData = []
     allCount.text = ""
     payLabel.text = ""
     tableView.reloadData()
   }
+  
   @objc private func cancelButtonTapped() {
     orderListClear()
   }
   
   @objc private func orderButtonTapped() {
-    if nameData.isEmpty {
+    if menuData.nameData.isEmpty {
       let emptyAlert = UIAlertController(title: "주문내역을 확인해 주십시오", message: "", preferredStyle: .alert)
       let okAction = UIAlertAction(title: "확인", style: .default, handler: nil)
       emptyAlert.addAction(okAction)
@@ -425,7 +399,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
       let noAction = UIAlertAction(title: "아니오", style: .cancel, handler: nil)
       alert.addAction(yesAction)
       alert.addAction(noAction)
-      
       present(alert, animated: true, completion: nil)
     }
   }

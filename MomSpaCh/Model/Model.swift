@@ -13,6 +13,12 @@ struct MenuItem {
 }
 
 struct MenuData {
+  var nameData = [String]()
+  var priceData = [Int]()
+  var countData = [Int]()
+  var countSum = 0
+  var paySum = 0
+  
   let menuArray = [
     MenuItem(category: "burger", imageName: "burgerBeefSteak", menuName: "비프스테이크버거", menuPrice: 8900),
     MenuItem(category: "burger", imageName: "burgerBulgogi", menuName: "불고기버거", menuPrice: 6900),
