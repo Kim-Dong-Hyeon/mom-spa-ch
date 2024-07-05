@@ -68,8 +68,8 @@ class MainView: UIView {
     logo.snp.makeConstraints {
       $0.width.equalTo(120)
       $0.height.equalTo(40)
-      $0.top.equalToSuperview().inset(60)
-      $0.leading.equalToSuperview().inset(20)
+      $0.leading.equalTo(self.safeAreaLayoutGuide.snp.leading).offset(20)
+      $0.bottom.equalTo(self.safeAreaLayoutGuide.snp.top).offset(40)
     }
   }
   
@@ -91,8 +91,9 @@ class MainView: UIView {
   /// setupSegmentedControlConstraints: UISegmentedControl의 제약 조건을 설정하는 메서드
   private func setupSegmentedControlConstraints() {
     segmentedControl.snp.makeConstraints {
-      $0.leading.trailing.equalToSuperview().inset(20)
-      $0.top.equalToSuperview().offset(120)
+      $0.leading.equalTo(self.safeAreaLayoutGuide.snp.leading).offset(20)
+      $0.trailing.equalTo(self.safeAreaLayoutGuide.snp.trailing).offset(-20)
+      $0.top.equalTo(logo.snp.bottom).offset(10)
     }
   }
   
