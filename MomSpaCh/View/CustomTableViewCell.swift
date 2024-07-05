@@ -6,7 +6,6 @@
 //
 
 import UIKit
-
 import SnapKit
 
 protocol CustomTableViewCellDelegate: AnyObject {
@@ -126,14 +125,10 @@ class CustomTableViewCell: UITableViewCell {
         countLabel.text = String(count - 1)
         if let payText = payLabel.text, let pay = Int(payText) {
           if String((pay / count) * (count - 1)) == "0" {
-            print("삭제")
             delegate?.deleteButton(in: self)
-            
           } else {
-            print("정상")
             payLabel.text = String((pay / count) * (count - 1))
           }
-          
           delegate?.minusButtonTap(in: self)
         }
       }

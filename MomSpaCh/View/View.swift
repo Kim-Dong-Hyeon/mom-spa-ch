@@ -376,8 +376,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     menuData.nameData = []
     menuData.priceData = []
     menuData.countData = []
-    allCount.text = ""
-    payLabel.text = ""
+    allCount.text = "0"
+    payLabel.text = "0"
     tableView.reloadData()
   }
   
