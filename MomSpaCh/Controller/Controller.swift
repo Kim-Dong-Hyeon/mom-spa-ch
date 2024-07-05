@@ -7,6 +7,12 @@
 
 import UIKit
 
-class Controller {
-  
+class ViewController: UIViewController {
+  private var mainView: MainView!
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    mainView = MainView(frame: self.view.frame)
+    view.backgroundColor = .systemBackground
+    self.view.addSubview(mainView)
+  }
 }

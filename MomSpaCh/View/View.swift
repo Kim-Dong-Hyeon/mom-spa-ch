@@ -9,7 +9,7 @@ import UIKit
 
 import SnapKit
 
-class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate,
+class MainView: UIView, UITableViewDataSource, UITableViewDelegate,
                       CustomTableViewCellDelegate, UICollectionViewDelegate,
                       MenuCollectionViewCellDelegate, UICollectionViewDataSource,
                       UICollectionViewDelegateFlowLayout {
@@ -42,15 +42,23 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     logo.contentMode = .scaleAspectFit
     return logo
   }()
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+    main()
+  }
   
-  override func viewDidLoad() {
-    super.viewDidLoad()
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+    main()
+  }
+  func main() {
     
-    view.backgroundColor = .systemBackground
+    
+    
     
     [logo, segmentedControl, scrollView, allCount, payLabel, menuCollectionView, tableView,
      allCount, payLabel, stackView, orderQuantity, totalAmount].forEach {
-      view.addSubview( $0 )
+      addSubview( $0 )
     }
 
     [productNameLabel, quantityLabel, amount].forEach { stackView.addArrangedSubview($0) }
@@ -234,7 +242,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
       MenuCollectionViewCell.self,
       forCellWithReuseIdentifier: MenuCollectionViewCell.identifier
     )
-    view.addSubview(menuCollectionView)
+    addSubview(menuCollectionView)
   }
   
   /// 컬렉션뷰 제약조건 설정
@@ -366,12 +374,12 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     stackView.distribution = .fillEqually
     stackView.spacing = 10
     
-    view.addSubview(stackView)
+    addSubview(stackView)
     
     stackView.snp.makeConstraints {
-      $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
-      $0.leading.equalTo(view.safeAreaLayoutGuide.snp.leading).offset(20)
-      $0.trailing.equalTo(view.safeAreaLayoutGuide.snp.trailing).offset(-20)
+      $0.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
+      $0.leading.equalTo(safeAreaLayoutGuide.snp.leading).offset(20)
+      $0.trailing.equalTo(safeAreaLayoutGuide.snp.trailing).offset(-20)
       $0.height.equalTo(50)
     }
   }
@@ -418,7 +426,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
       let emptyAlert = UIAlertController(title: "주문내역을 확인해 주십시오", message: "", preferredStyle: .alert)
       let okAction = UIAlertAction(title: "확인", style: .default, handler: nil)
       emptyAlert.addAction(okAction)
-      present(emptyAlert, animated: true, completion: nil)
+      //present(emptyAlert, animated: true, completion: nil)
     } else {
       let alert = UIAlertController(title: "최종 결제 금액 \(payLabel.text!)원입니다. 주문하시겠습니까?", message: "", preferredStyle: .alert)
       let yesAction = UIAlertAction(title: "네", style: .default) { _ in
@@ -427,7 +435,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
       let noAction = UIAlertAction(title: "아니오", style: .cancel, handler: nil)
       alert.addAction(yesAction)
       alert.addAction(noAction)
-      present(alert, animated: true, completion: nil)
+      //present(alert, animated: true, completion: nil)
     }
   }
   
@@ -436,6 +444,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     let okAction = UIAlertAction(title: "확인", style: .default, handler: nil)
     completedAlert.addAction(okAction)
     orderListClear()
-    present(completedAlert, animated: true, completion: nil)
+    //present(completedAlert, animated: true, completion: nil)
   }
 }
