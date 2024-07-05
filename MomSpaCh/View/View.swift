@@ -73,6 +73,11 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
   }
   
+  /// addOrderList
+  /// - Parameters: 메뉴에서 버튼을 눌러 주문리스트에 추가하는 함수
+  ///   - pay: 금액
+  ///   - name: 상품
+  ///   Developer : 백시훈
   func addOrderList(_ pay: String, _ name: String){
     if menuData.nameData.contains(name){
       checkDuplication = true//중복일때
@@ -117,7 +122,9 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     menuCollectionView.reloadData()
   }
   
-  // Constraints 묶어야 함
+  
+  /// setupTableView : 테이블 뷰 생성
+  /// Developer : 백시훈
   func setupTableView() {
     tableView.dataSource = self
     tableView.delegate = self
@@ -175,10 +182,22 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     tableView.register(CustomTableViewCell.self, forCellReuseIdentifier: "CustomCell") // 셀 등록
   }
   
+  /// tableView : 테이블 뷰의 cell을 갯수를 리턴하는 메서드
+  /// - Parameters:
+  ///   - tableView: 테이블 뷰
+  ///   - section: 갯수
+  /// - Returns: 테이블 cell 갯수
+  /// Developer : 백시훈
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     return menuData.nameData.count
   }
   
+  /// tableView : 테이블 뷰 구성요소 데이터 넣는 메서드
+  /// - Parameters:
+  ///   - tableView: 테이블 뷰
+  ///   - indexPath: 선택된 cell
+  /// - Returns: cell
+  /// Developer : 백시훈
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     guard let cell = tableView.dequeueReusableCell(withIdentifier: "CustomCell", for: indexPath) as? CustomTableViewCell else {
       return UITableViewCell()
@@ -192,6 +211,9 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     return cell
   }
   
+  /// deleteButton : cell에서 삭제된 데이터 처리
+  /// - Parameter cell: 삭제 cell
+  /// Developer : 백시훈
   func deleteButton(in cell: CustomTableViewCell) {
     if let indexPath = tableView.indexPath(for: cell) {
       menuData.nameData.remove(at: indexPath.row)
@@ -286,6 +308,9 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
   }
   
+  /// plusButtonTap : 플러스 버튼시 이벤트
+  /// - Parameter cell: 플러스 버튼 누른 cell
+  /// Developer : 백시훈
   func plusButtonTap(in cell: CustomTableViewCell) {
     guard let indexPath = tableView.indexPath(for: cell) else {
       return
@@ -307,6 +332,9 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     payLabel.text = String(menuData.paySum)
   }
   
+  /// minusButtonTap : 마이너스 버튼 클릭 이벤트 메서드
+  /// - Parameter cell: 마이너스 버튼 누른 cell
+  /// Developer : 백시훈
   func minusButtonTap(in cell: CustomTableViewCell) {
     
     guard let indexPath = tableView.indexPath(for: cell) else {
@@ -376,8 +404,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     menuData.nameData = []
     menuData.priceData = []
     menuData.countData = []
-    allCount.text = ""
-    payLabel.text = ""
+    allCount.text = "0"
+    payLabel.text = "0"
     tableView.reloadData()
   }
   
