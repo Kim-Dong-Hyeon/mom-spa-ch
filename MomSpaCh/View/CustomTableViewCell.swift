@@ -9,6 +9,8 @@ import UIKit
 
 import SnapKit
 
+// MARK: - UITableView (Developer: 백시훈)
+
 protocol CustomTableViewCellDelegate: AnyObject {
   func deleteButton(in cell: CustomTableViewCell)
   func plusButtonTap(in cell: CustomTableViewCell)

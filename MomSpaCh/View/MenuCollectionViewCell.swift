@@ -9,6 +9,8 @@ import UIKit
 
 import SnapKit
 
+// MARK: - UICollectionView (Developer: 김윤홍)
+
 protocol MenuCollectionViewCellDelegate: AnyObject {
   func addOrderList(_: String, _: String)
 }
