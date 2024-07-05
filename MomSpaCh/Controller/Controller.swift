@@ -26,6 +26,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   override func loadView() {
     super.loadView()
     mainView = MainView(frame: self.view.frame)
+    mainView.delegate = self
     self.view = mainView
   }
   
@@ -253,6 +254,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     mainView.allCount.text = "0"
     mainView.payLabel.text = "0"
     mainView.tableView.reloadData()
+    print(10)
   }
   
   func clickedOrderButton() {
