@@ -5,54 +5,43 @@
 //  Created by 김동현 on 7/2/24.
 //
 
-struct Data {
-  var totalPrice = 0
-  var count = 0
-  var totalCount = 0
-  
-  let burger : [String] = ["burgerBeefSteak", "burgerBulgogi", "burgerChiliShrimp", "burgerDeepCheese",
-                 "burgerDeluxeBulgogi", "burgerFillet", "burgerGrilledBeef", "burgerInvredible",
-                 "burgerShrimp", "burgerShrimpBulgogi", "burgerSpicyThigh", "burgerThigh"]
-  
-  let chicken = ["chickenCheeseSprinkled", "chickenChipao", "chickenFried", "chickenHalf", "chickenSoyGalic"]
+struct MenuItem {
+  let category: String
+  let imageName: String
+  let menuName: String
+  let menuPrice: Int
+}
 
-  let sideMenu = ["sideCheeseBall", "sideCheeseStick", "sideCorn", "sideFrenchFries", "sidePopcornBall", "sideTwistSnack"]
-  
-  let drink = ["drinkAmericano", "drinkCider", "drinkCola", "drinkGreenGrapeAde", "drinkLemonAde", "drinkOrangeJuice"]
-  
-  let koreanName = [
-    "burgerBeefSteak" : "비프스테이크버거",
-    "burgerBulgogi" : "불고기버거",
-    "burgerChiliShrimp" : "칠리새우버거",
-    "burgerDeepCheese" : "딥치즈버거",
-    "burgerDeluxeBulgogi" : "디럭스불고기버거",
-    "burgerFillet" : "휠렛버거",
-    "burgerGrilledBeef" : "그릴드비프버거",
-    "burgerInvredible" : "언블리버블버거",
-    "burgerShrimp" : "통새우버거",
-    "burgerShrimpBulgogi" : "새우불고기버거",
-    "burgerSpicyThigh" : "불싸이버거",
-    "burgerThigh" : "싸이버거",
-    "chickenCheeseSprinkled" : "치즈뿌린치킨",
-    "chickenChipao" : "치파오싸이치킨",
-    "chickenFried" : "후라이드치킨",
-    "chickenHalf" : "반반치킨",
-    "chickenSoyGalic" : "간장마늘치킨",
-    "sideCheeseBall" : "치즈볼",
-    "sideCheeseStick" : "치즈스틱",
-    "sideCorn" : "콘샐러드",
-    "sideFrenchFries" : "케이준양념감자",
-    "sidePopcornBall" : "팝콘볼",
-    "sideTwistSnack" : "꿀꽈배기크림치즈",
-    "drinkAmericano" : "아이스아메리카노",
-    "drinkCider" : "사이다",
-    "drinkCola" : "콜라",
-    "drinkGreenGrapeAde" : "청포도에이드",
-    "drinkLemonAde" : "레몬에이드",
-    "drinkOrangeJuice" : "오렌지주스"]
-  
-  let burgerPrice = [12900, 11900, 13900, 12900, 11900, 9900, 11800, 11900, 13900, 12900, 9900, 8900]
-  let chickenPrice = [18900, 21900, 23900, 22900, 21900]
-  let sidePrice = [3900, 4900, 3900, 2900, 3900, 4900]
-  let drinkPrice = [2900, 1900, 1900, 2900, 2900, 3900]
+struct MenuData {
+  let menuArray = [
+    MenuItem(category: "burger", imageName: "burgerBeefSteak", menuName: "비프스테이크버거", menuPrice: 8900),
+    MenuItem(category: "burger", imageName: "burgerBulgogi", menuName: "불고기버거", menuPrice: 6900),
+    MenuItem(category: "burger", imageName: "burgerChiliShrimp", menuName: "칠리새우버거", menuPrice: 8900),
+    MenuItem(category: "burger", imageName: "burgerDeepCheese", menuName: "딥치즈버거", menuPrice: 7900),
+    MenuItem(category: "burger", imageName: "burgerDeluxeBulgogi", menuName: "디럭스불고기버거", menuPrice: 8900),
+    MenuItem(category: "burger", imageName: "burgerFillet", menuName: "휠렛버거", menuPrice: 6900),
+    MenuItem(category: "burger", imageName: "burgerGrilledBeef", menuName: "그릴드비프버거", menuPrice: 7900),
+    MenuItem(category: "burger", imageName: "burgerInvredible", menuName: "언블리버블버거", menuPrice: 8900),
+    MenuItem(category: "burger", imageName: "burgerShrimp", menuName: "통새우버거", menuPrice: 9900),
+    MenuItem(category: "burger", imageName: "burgerShrimpBulgogi", menuName: "새우불고기버거", menuPrice: 9900),
+    MenuItem(category: "burger", imageName: "burgerSpicyThigh", menuName: "불싸이버거", menuPrice: 8900),
+    MenuItem(category: "burger", imageName: "burgerThigh", menuName: "싸이버거", menuPrice: 3900),
+    MenuItem(category: "chicken", imageName: "chickenCheeseSprinkled", menuName: "치즈뿌치", menuPrice: 22900),
+    MenuItem(category: "chicken", imageName: "chickenChipao", menuName: "치파오싸이치킨", menuPrice: 21900),
+    MenuItem(category: "chicken", imageName: "chickenFried", menuName: "후라이드치킨", menuPrice: 18900),
+    MenuItem(category: "chicken", imageName: "chickenHalf", menuName: "반반치킨", menuPrice: 19900),
+    MenuItem(category: "chicken", imageName: "chickenSoyGalic", menuName: "간장마늘치킨", menuPrice: 19900),
+    MenuItem(category: "sideMenu", imageName: "sideCheeseBall", menuName: "치즈볼", menuPrice: 4900),
+    MenuItem(category: "sideMenu", imageName: "sideCheeseStick", menuName: "치즈스틱", menuPrice: 2900),
+    MenuItem(category: "sideMenu", imageName: "sideCorn", menuName: "콘샐러드", menuPrice: 2900),
+    MenuItem(category: "sideMenu", imageName: "sideFrenchFries", menuName: "케이준양념감자", menuPrice: 3900),
+    MenuItem(category: "sideMenu", imageName: "sidePopcornBall", menuName: "팝콘볼", menuPrice: 4900),
+    MenuItem(category: "sideMenu", imageName: "sideTwistSnack", menuName: "꿀꽈배기크림치즈", menuPrice: 3900),
+    MenuItem(category: "drink", imageName: "drinkAmericano", menuName: "아이스아메리카노", menuPrice: 2900),
+    MenuItem(category: "drink", imageName: "drinkCider", menuName: "사이다", menuPrice: 1900),
+    MenuItem(category: "drink", imageName: "drinkCola", menuName: "콜라", menuPrice: 1900),
+    MenuItem(category: "drink", imageName: "drinkGreenGrapeAde", menuName: "청포도에이드", menuPrice: 3900),
+    MenuItem(category: "drink", imageName: "drinkLemonAde", menuName: "레몬에이드", menuPrice: 3900),
+    MenuItem(category: "drink", imageName: "drinkOrangeJuice", menuName: "오렌지주스", menuPrice: 3900)
+  ]
 }

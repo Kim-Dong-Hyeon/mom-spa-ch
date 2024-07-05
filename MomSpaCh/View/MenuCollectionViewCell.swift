@@ -8,12 +8,15 @@
 import UIKit
 
 import SnapKit
+
 protocol MenuCollectionViewCellDelegate: AnyObject {
   func addOrderList(_: String, _: String)
 }
+
+/// UICollectionViewCell 클래스
 class MenuCollectionViewCell: UICollectionViewCell {
   weak var delegate: MenuCollectionViewCellDelegate?
-  lazy var menuData = Data()
+  lazy var menuData = MenuData()
   static let identifier = "cell"
   
   private lazy var menuButton: UIButton = {
@@ -25,14 +28,12 @@ class MenuCollectionViewCell: UICollectionViewCell {
   private let priceLabel: UILabel = {
     var priceLabel = UILabel()
     priceLabel.font = UIFont.boldSystemFont(ofSize: 15)
-    priceLabel.textColor = .systemPink
     return priceLabel
   }()
   
   private let nameLabel: UILabel = {
     var nameLabel = UILabel()
     nameLabel.font = UIFont.boldSystemFont(ofSize: 15)
-    nameLabel.textColor = .systemRed
     return nameLabel
   }()
   
@@ -48,15 +49,21 @@ class MenuCollectionViewCell: UICollectionViewCell {
     fatalError("init(coder:) has not been implemented")
   }
   
+  /// cell 내용설정
+  /// - Parameters:
+  ///   - imageName: 사진이름
+  ///   - price: 가격
+  ///   - name: 이름
   func configure(withImageName imageName: String, price: Int, name: String) {
     if let image = UIImage(named: imageName) {
       menuButton.setTitle(imageName, for: .normal)
       menuButton.setImage(image, for: .normal)
     }
-    priceLabel.text = "\(price) 원"
+    priceLabel.text = "\(price)원"
     nameLabel.text = name
   }
   
+  /// 오토레이아웃 설정
   func setConstraints() {
     menuButton.snp.makeConstraints { make in
       make.top.equalToSuperview().inset(10)
@@ -80,9 +87,8 @@ class MenuCollectionViewCell: UICollectionViewCell {
   
 
   @objc func buttonClicked(sender: UIButton) {
-    var price = priceLabel.text!.filter { $0 != "원" && $0 != " "}
-    var name = menuData.koreanName[sender.currentTitle!]!
-    print(name)
+    let price = priceLabel.text!.filter { $0 != "원" && $0 != " "}
+    let name = nameLabel.text!
     delegate?.addOrderList(price, name)
 
   }

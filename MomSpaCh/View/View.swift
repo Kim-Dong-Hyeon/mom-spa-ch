@@ -6,11 +6,14 @@
 //
 
 import UIKit
+
 import SnapKit
 
-class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, 
-                        CustomTableViewCellDelegate, UICollectionViewDelegate,MenuCollectionViewCellDelegate {
-  let menuData = Data()
+class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate,
+                        CustomTableViewCellDelegate, UICollectionViewDelegate,
+                      MenuCollectionViewCellDelegate, UICollectionViewDataSource,
+                      UICollectionViewDelegateFlowLayout {
+  let menuData = MenuData()
   private let tableView = UITableView()
   static let identifier = "mainViewController"
   private let allCount = UILabel()
@@ -113,7 +116,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     menuCollectionView.reloadData()
   }
   
-
   // Constraints 묶어야 함
   func setupTableView() {
     tableView.dataSource = self
@@ -126,6 +128,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     allCount.textAlignment = .center
     allCount.text = ""
     payLabel.text = ""
+    payLabel.adjustsFontSizeToFitWidth = true
     payLabel.layer.borderWidth = 1.0
     payLabel.textAlignment = .center
     payLabel.layer.borderColor = UIColor.red.cgColor
@@ -178,7 +181,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     
     tableView.register(CustomTableViewCell.self, forCellReuseIdentifier: "CustomCell") // 셀 등록
-
+    
   }
   
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -190,7 +193,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
       return UITableViewCell()
     }
     cell.itemNameLabel.text = nameData[indexPath.row]
-
+    
     cell.countLabel.text = String(countData[indexPath.row])
     
     
@@ -213,6 +216,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
   }
   
+  /// 컬렉션뷰 만들기
   func setupCollectionView() {
     self.menuCollectionView.dataSource = self
     self.menuCollectionView.delegate = self
@@ -224,6 +228,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     view.addSubview(menuCollectionView)
   }
   
+  /// 컬렉션뷰 제약조건 설정
   func setupCollectionViewConstraint() {
     menuCollectionView.snp.makeConstraints {
       $0.leading.trailing.equalToSuperview().inset(30)
@@ -232,6 +237,11 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
   }
   
+  /// 컬렉션뷰 셀을 컬렉션 뷰 않에 넣기
+  /// - Parameters:
+  ///   - collectionView: 넣어야할 컬렉션뷰
+  ///   - indexPath: cell indextPath
+  /// - Returns: 다운캐스팅 실패시 기본셀 리턴
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MenuCollectionViewCell.identifier, for: indexPath) as? MenuCollectionViewCell else {
       return UICollectionViewCell()
@@ -240,59 +250,78 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     //    var menuItems: [String]
     switch selectedCategory {
     case "버거":
-      let item = menuData.burger[indexPath.item]
-      cell.configure(withImageName: item, price: menuData.burgerPrice[indexPath.item], name: changeName(item))
+      let burgerItem = menuData.menuArray.filter {$0.category == "burger"}
+      let item = burgerItem[indexPath.row]
+      cell.configure(withImageName: item.imageName, price: item.menuPrice, name: item.menuName)
+      
     case "치킨":
-      let item = menuData.chicken[indexPath.item]
-      cell.configure(withImageName: item, price: menuData.chickenPrice[indexPath.item], name: changeName(item))
+      let chickenItem = menuData.menuArray.filter {$0.category == "chicken"}
+      let item = chickenItem[indexPath.row]
+      cell.configure(withImageName: item.imageName, price: item.menuPrice, name: item.menuName)
+      
     case "사이드":
-      let item = menuData.sideMenu[indexPath.item]
-      cell.configure(withImageName: item, price: menuData.sidePrice[indexPath.item], name: changeName(item))
+      let sideMenuItem = menuData.menuArray.filter {$0.category == "sideMenu"}
+      let item = sideMenuItem[indexPath.row]
+      cell.configure(withImageName: item.imageName, price: item.menuPrice, name: item.menuName)
+      
     case "음료":
-      let item = menuData.drink[indexPath.item]
-      cell.configure(withImageName: item, price: menuData.drinkPrice[indexPath.item], name: changeName(item))
+      let drinkItem = menuData.menuArray.filter {$0.category == "drink"}
+      let item = drinkItem[indexPath.row]
+      cell.configure(withImageName: item.imageName, price: item.menuPrice, name: item.menuName)
+      
     default:
-      var allItemName: [String] = menuData.burger
-      menuData.chicken.forEach { allItemName.append($0) }
-      menuData.sideMenu.forEach { allItemName.append($0) }
-      menuData.drink.forEach { allItemName.append($0) }
-      var allItemPrice: [Int] = menuData.burgerPrice
-      menuData.chickenPrice.forEach { allItemPrice.append($0) }
-      menuData.sidePrice.forEach { allItemPrice.append($0) }
-      menuData.drinkPrice.forEach { allItemPrice.append($0) }
-      
-      cell.configure(withImageName: allItemName[indexPath.item], price: allItemPrice[indexPath.item], name: changeName(allItemName[indexPath.item]))
-      
+      let item = menuData.menuArray[indexPath.row]
+      cell.configure(withImageName: item.imageName, price: item.menuPrice, name: item.menuName)
     }
     cell.delegate = self
     return cell
   }
   
-  func changeName(_ name: String) -> String {
-    return menuData.koreanName[name]!
+  /// collectionView 제약 조건
+  /// - Returns: 사이즈
+  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    return CGSize(width: 130, height: 170)
+  }
+  
+  
+  /// 컬렉션 뷰 내부 셀구성 개수 설정
+  /// - Returns: 개수
+  func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    switch selectedCategory {
+    case "버거":
+      return menuData.menuArray.filter{ $0.category == "burger"}.count
+    case "치킨":
+      return menuData.menuArray.filter{ $0.category == "chicken"}.count
+    case "사이드":
+      return menuData.menuArray.filter{ $0.category == "sideMenu"}.count
+    case "음료":
+      return menuData.menuArray.filter{ $0.category == "drink"}.count
+    default:
+      return menuData.menuArray.count
+    }
   }
   
   func plusButtonTap(in cell: CustomTableViewCell) {
     guard let indexPath = tableView.indexPath(for: cell) else {
-        return
+      return
     }
     var sum = 0
     var paySum = 0
     
-      if let cell = tableView.cellForRow(at: indexPath) as? CustomTableViewCell,
-         let countText = cell.itemNameLabel.text{
-        print(countText)
-          for i in 0..<nameData.count{
-            if nameData[i] == countText{
-              let count = Int(countData[i])
-              countData[i] += 1
-              sum = countData.reduce(0, +)
-              print(countData)
-              priceData[i] = (priceData[i] / count) * (count + 1)
-              paySum = priceData.reduce(0, +)
-            }
-          }
+    if let cell = tableView.cellForRow(at: indexPath) as? CustomTableViewCell,
+       let countText = cell.itemNameLabel.text{
+      print(countText)
+      for i in 0..<nameData.count{
+        if nameData[i] == countText{
+          let count = Int(countData[i])
+          countData[i] += 1
+          sum = countData.reduce(0, +)
+          print(countData)
+          priceData[i] = (priceData[i] / count) * (count + 1)
+          paySum = priceData.reduce(0, +)
+        }
       }
+    }
     
     allCount.text = String(sum)
     payLabel.text = String(paySum)
@@ -302,7 +331,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     var sum = 0
     var paySum = 0
     guard let indexPath = tableView.indexPath(for: cell) else {
-        return
+      return
     }
     print(indexPath.row)
     if let cell = tableView.cellForRow(at: indexPath) as? CustomTableViewCell,
@@ -409,27 +438,3 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     present(completedAlert, animated: true, completion: nil)
   }
 }
-
-extension ViewController: UICollectionViewDataSource {
-  func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-    switch selectedCategory {
-    case "버거":
-      return menuData.burger.count
-    case "치킨":
-      return menuData.chicken.count
-    case "사이드":
-      return menuData.sideMenu.count
-    case "음료":
-      return menuData.drink.count
-    default:
-      return menuData.burger.count + menuData.chicken.count + menuData.sideMenu.count + menuData.drink.count
-    }
-  }
-}
-
-extension ViewController: UICollectionViewDelegateFlowLayout {
-  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    return CGSize(width: 130, height: 170)
-  }
-}
-
