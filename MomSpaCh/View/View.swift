@@ -69,8 +69,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     logo.snp.makeConstraints {
       $0.width.equalTo(120)
       $0.height.equalTo(40)
-      $0.top.equalToSuperview().inset(60)
-      $0.leading.equalToSuperview().inset(20)
+      $0.leading.equalTo(view.safeAreaLayoutGuide.snp.leading).offset(20)
+      $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.top).offset(40)
     }
   }
 
@@ -91,8 +91,9 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   /// UISegmentedControl의 제약 조건을 설정하는 메서드
   private func setupSegmentedControlConstraints() {
     segmentedControl.snp.makeConstraints {
-      $0.leading.trailing.equalToSuperview().inset(20)
-      $0.top.equalTo(logo.snp.bottom).offset(20)
+      $0.leading.equalTo(view.safeAreaLayoutGuide.snp.leading).offset(20)
+      $0.trailing.equalTo(view.safeAreaLayoutGuide.snp.trailing).offset(-20)
+      $0.top.equalTo(logo.snp.bottom).offset(10)
     }
   }
 
@@ -110,7 +111,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   func setupCollectionView() {
     self.menuCollectionView.dataSource = self
     self.menuCollectionView.delegate = self
-    // CodeConvention 재확인 필요
     self.menuCollectionView.register(
       MenuCollectionViewCell.self,
       forCellWithReuseIdentifier: MenuCollectionViewCell.identifier
@@ -121,9 +121,10 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   /// 컬렉션뷰 제약조건 설정
   func setupCollectionViewConstraint() {
     menuCollectionView.snp.makeConstraints {
-      $0.leading.trailing.equalToSuperview().inset(30)
-      $0.top.equalToSuperview().inset(150)
-      $0.bottom.equalToSuperview().inset(300) // 추후 tableView로 변경
+      $0.leading.equalTo(view.safeAreaLayoutGuide.snp.leading).offset(40)
+      $0.trailing.equalTo(view.safeAreaLayoutGuide.snp.trailing).offset(-40)
+      $0.top.equalTo(segmentedControl.snp.bottom).offset(20)
+      $0.bottom.equalTo(stackView.snp.top).offset(-20)
     }
   }
 
@@ -256,18 +257,21 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 
     tableView.snp.makeConstraints {
       $0.height.equalTo(130)
-      $0.leading.equalToSuperview().inset(20)
-      $0.bottom.equalToSuperview().inset(100)
-      $0.trailing.equalToSuperview().inset(80)
+      $0.leading.equalTo(view.safeAreaLayoutGuide.snp.leading).offset(20)
+      $0.trailing.equalTo(view.safeAreaLayoutGuide.snp.trailing).offset(-90)
+      $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(60)
     }
+
     allCount.snp.makeConstraints {
       $0.leading.equalTo(tableView.snp.trailing).offset(10)
+      $0.trailing.equalTo(view.safeAreaLayoutGuide.snp.trailing).offset(-20)
       $0.centerY.equalTo(tableView.snp.top).offset(15)
       $0.height.equalTo(30)
       $0.width.equalTo(60)
     }
     payLabel.snp.makeConstraints {
       $0.leading.equalTo(tableView.snp.trailing).offset(10)
+      $0.trailing.equalTo(view.safeAreaLayoutGuide.snp.trailing).offset(-20)
       $0.centerY.equalTo(tableView.snp.top).offset(90)
       $0.height.equalTo(30)
       $0.width.equalTo(60)
