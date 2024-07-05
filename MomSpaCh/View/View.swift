@@ -357,6 +357,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
   }
   
+  /// cancelButton과 orderButton을 stackView에 추가 & layout
   private func setupButtonsStackView() {
     let cancelButton = createCancelButton()
     let orderButton = createOrderButton()
@@ -376,6 +377,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
   }
   
+  /// cancelButton과 orderButton을 stackView에 추가 & layout
   private func createOrderButton() -> UIButton {
     let button = UIButton(type: .system)
     button.setTitle("주문하기", for: .normal)
@@ -387,6 +389,9 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     return button
   }
   
+  
+  /// cancelButton 생성
+  /// - Returns: 생성한 버튼 리턴
   private func createCancelButton() -> UIButton {
     let button = UIButton(type: .system)
     button.setTitle("취소", for: .normal)
@@ -400,6 +405,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     return button
   }
   
+  /// 주문 내역을 처음 상태로 초기화
   func orderListClear() {
     menuData.nameData = []
     menuData.priceData = []
@@ -409,10 +415,13 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     tableView.reloadData()
   }
   
+  /// cancleButton 클릭
   @objc private func cancelButtonTapped() {
     orderListClear()
   }
   
+  /// orderButton 클릭
+  /// 주문내역의 유무에 따른 메세지 표시
   @objc private func orderButtonTapped() {
     if menuData.nameData.isEmpty {
       let emptyAlert = UIAlertController(title: "주문내역을 확인해 주십시오", message: "", preferredStyle: .alert)
@@ -431,6 +440,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
   }
   
+  
+  /// 최종 주문 완료 메세지
   private func orderCompletedAlert() {
     let completedAlert = UIAlertController(title: "주문 완료되었습니다.", message: "", preferredStyle: .alert)
     let okAction = UIAlertAction(title: "확인", style: .default, handler: nil)
