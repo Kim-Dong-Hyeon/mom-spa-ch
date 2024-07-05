@@ -16,7 +16,7 @@ protocol MainViewDelegate: AnyObject {
 
 class MainView: UIView {
   weak var delegate: MainViewDelegate?
-  var selectedCategory = "전체"
+  var selectedCategory = "all"
   let allCount = UILabel()
   let amount = UILabel()
   let payLabel = UILabel()

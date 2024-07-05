@@ -14,7 +14,7 @@ Commit Style Guide
 | Design | CSS 등 사용자 UI 디자인 변경 |
 | !HOTFIX | 급하게 치명적인 버그를 고쳐야하는 경우 |
 | Style | 코드 포맷 변경, 세미 콜론 누락, 코드 수정이 없는 경우 |
-| Refactor | 프로덕션 코드 리팩토링 |
+| Refactor | 코드 리팩토링 |
 | Comment | 필요한 주석 추가 및 변경 |
 | Docs | 문서 수정 |
 | Test | 테스트 코드, 리펙토링 테스트 코드 추가, Production Code(실제로 사용하는 코드) 변경 없음 |
