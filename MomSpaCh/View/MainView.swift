@@ -16,7 +16,6 @@ protocol MainViewDelegate: AnyObject {
 
 class MainView: UIView {
   weak var delegate: MainViewDelegate?
-  private let segmentedControl = UISegmentedControl(items: ["전체", "버거", "치킨", "사이드", "음료"])
   var selectedCategory = "전체"
   let allCount = UILabel()
   let amount = UILabel()
@@ -34,6 +33,8 @@ class MainView: UIView {
     logo.contentMode = .scaleAspectFit
     return logo
   }()
+  
+  let segmentedControl = UISegmentedControl(items: ["전체", "버거", "치킨", "사이드", "음료"])
   
   let menuCollectionView: UICollectionView = {
     let layout = UICollectionViewFlowLayout()
@@ -85,7 +86,6 @@ class MainView: UIView {
       blue: 81/255,
       alpha: 0.5
     )
-    segmentedControl.addTarget(self, action: #selector(categoryChanged(_:)), for: .valueChanged)
   }
   
   /// setupSegmentedControlConstraints: UISegmentedControl의 제약 조건을 설정하는 메서드
@@ -95,14 +95,6 @@ class MainView: UIView {
       $0.trailing.equalTo(self.safeAreaLayoutGuide.snp.trailing).offset(-20)
       $0.top.equalTo(logo.snp.bottom).offset(10)
     }
-  }
-  
-  // View or Controller 정하기
-  /// categoryChanged: UISegmentedControl의 값이 변경되었을 때 호출되는 메서드
-  /// - Parameter sender: UISegmentedControl
-  @objc private func categoryChanged(_ sender: UISegmentedControl) {
-    selectedCategory = segmentedControl.titleForSegment(at: sender.selectedSegmentIndex) ?? "전체"
-    menuCollectionView.reloadData()
   }
   
   /// 컬렉션뷰 제약조건 설정

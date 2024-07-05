@@ -34,6 +34,15 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     super.viewDidLoad()
     setupTableView()
     setupCollectionView()
+    mainView.segmentedControl.addTarget(self, action: #selector(categoryChanged(_:)), for: .valueChanged)
+  }
+  
+  // View or Controller 정하기
+  /// categoryChanged: UISegmentedControl의 값이 변경되었을 때 호출되는 메서드
+  /// - Parameter sender: UISegmentedControl
+  @objc private func categoryChanged(_ sender: UISegmentedControl) {
+    mainView.selectedCategory = mainView.segmentedControl.titleForSegment(at: sender.selectedSegmentIndex) ?? "전체"
+    mainView.menuCollectionView.reloadData()
   }
   
   // MARK: - UICollectionView (Developer: 김윤홍)
