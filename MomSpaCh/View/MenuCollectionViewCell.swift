@@ -65,31 +65,28 @@ class MenuCollectionViewCell: UICollectionViewCell {
   
   /// 오토레이아웃 설정
   func setConstraints() {
-    menuButton.snp.makeConstraints { make in
-      make.top.equalToSuperview().inset(10)
-      make.leading.trailing.equalToSuperview()
-      make.height.equalTo(100)
+    menuButton.snp.makeConstraints {
+      $0.top.equalToSuperview().inset(10)
+      $0.leading.trailing.equalToSuperview()
+      $0.height.equalTo(100)
     }
     
-    nameLabel.snp.makeConstraints { make in
-      make.top.equalTo(menuButton.snp.bottom).offset(5)
-      make.leading.trailing.equalToSuperview().inset(10)
-      make.height.equalTo(15)
-      
+    nameLabel.snp.makeConstraints {
+      $0.top.equalTo(menuButton.snp.bottom).offset(5)
+      $0.leading.trailing.equalToSuperview().inset(10)
+      $0.height.equalTo(15)
     }
     
-    priceLabel.snp.makeConstraints { make in
-      make.top.equalTo(nameLabel.snp.bottom).offset(5)
-      make.leading.trailing.equalToSuperview().inset(10)
-      make.height.equalTo(15)
+    priceLabel.snp.makeConstraints {
+      $0.top.equalTo(nameLabel.snp.bottom).offset(5)
+      $0.leading.trailing.equalToSuperview().inset(10)
+      $0.height.equalTo(15)
     }
   }
   
-
   @objc func buttonClicked(sender: UIButton) {
     let price = priceLabel.text!.filter { $0 != "원" && $0 != " "}
     let name = nameLabel.text!
     delegate?.addOrderList(price, name)
-
   }
 }
