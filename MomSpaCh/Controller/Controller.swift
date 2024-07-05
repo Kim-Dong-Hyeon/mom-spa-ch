@@ -69,6 +69,9 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     let selectedCategoryKorean = mainView.segmentedControl.titleForSegment(at: sender.selectedSegmentIndex) ?? "전체"
     mainView.selectedCategory = menuData.categoryMapping[selectedCategoryKorean] ?? "all"
     mainView.menuCollectionView.reloadData()
+    if !filteredMenuData.isEmpty {
+      mainView.menuCollectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: true)
+    }
   }
   
   // MARK: - UICollectionView (Developer: 김윤홍)
