@@ -18,7 +18,7 @@ class MenuCollectionViewCell: UICollectionViewCell {
   
   private lazy var menuButton: UIButton = {
     var menuButton = UIButton()
-    menuButton.backgroundColor = .systemBackground
+    menuButton.backgroundColor = UIColor(named: "menuButtonBackground")
     return menuButton
   }()
   
