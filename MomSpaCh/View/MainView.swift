@@ -73,6 +73,7 @@ class MainView: UIView {
     return collectionView
   }()
   
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     self.backgroundColor = .systemBackground
@@ -271,3 +272,5 @@ class MainView: UIView {
     delegate?.clickedOrderButton()
   }
 }
+
+
