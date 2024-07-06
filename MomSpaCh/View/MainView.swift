@@ -9,13 +9,7 @@ import UIKit
 
 import SnapKit
 
-protocol MainViewDelegate: AnyObject {
-  func orderListClear()
-  func clickedOrderButton()
-}
-
 class MainView: UIView {
-  weak var delegate: MainViewDelegate?
   var selectedCategory = "all"
   let allCount = UILabel()
   let amount = UILabel()
@@ -51,13 +45,32 @@ class MainView: UIView {
   let searchButton: UIButton = {
     let button = UIButton(type: .system)
     button.setImage(UIImage(systemName: "magnifyingglass"), for: .normal)
-    button.tintColor = UIColor(
-      red: 217/255,
-      green: 69/255,
-      blue: 81/255,
-      alpha: 0.5
-    )
+    button.tintColor = UIColor(named: "spaColor")
     return button
+  }()
+  
+  let showNextMenu: UIButton = {
+    let button = UIButton(type: .system)
+    button.setImage(UIImage(systemName: "chevron.right"), for: .normal)
+    button.transform = CGAffineTransform(scaleX: 2, y: 2)
+    button.tintColor = UIColor(named: "spaColor")
+    return button
+  }()
+  
+  let showPreviousMenu: UIButton = {
+    let button = UIButton(type: .system)
+    button.setImage(UIImage(systemName: "chevron.left"), for: .normal)
+    button.transform = CGAffineTransform(scaleX: 2, y: 2)
+    button.tintColor = UIColor(named: "spaColor")
+    return button
+  }()
+  
+  let pageControl: UIPageControl = {
+    let pagecontrol = UIPageControl()
+    pagecontrol.pageIndicatorTintColor = .lightGray
+    pagecontrol.currentPageIndicatorTintColor = UIColor(named: "spaColor")
+    pagecontrol.numberOfPages = 8
+    return pagecontrol
   }()
   
   let segmentedControl = UISegmentedControl(items: ["전체", "버거", "치킨", "사이드", "음료"])
@@ -68,6 +81,36 @@ class MainView: UIView {
     return collectionView
   }()
   
+  let buttonStackView: UIStackView = {
+    let stackView = UIStackView()
+    stackView.axis = .horizontal
+    stackView.alignment = .fill
+    stackView.distribution = .fillEqually
+    stackView.spacing = 10
+    return stackView
+  }()
+  
+  var orderButton: UIButton = {
+    let button = UIButton(type: .system)
+    button.setTitle("주문하기", for: .normal)
+    button.titleLabel?.font = UIFont(name: "HelveticaNeue-Bold", size: 20)
+    button.backgroundColor = UIColor(named: "spaColor")
+    button.setTitleColor(UIColor(named: "orderButtonTitle"), for: .normal)
+    button.layer.cornerRadius = 5
+    return button
+  }()
+  
+  var cancelButton: UIButton = {
+    let button = UIButton(type: .system)
+    button.setTitle("취소", for: .normal)
+    button.titleLabel?.font = UIFont(name: "HelveticaNeue-Bold", size: 20)
+    button.backgroundColor = UIColor(named: "cancleButtonBackground")
+    button.setTitleColor(UIColor(named: "spaColor"), for: .normal)
+    button.layer.borderWidth = 1
+    button.layer.borderColor = UIColor(named: "spaColor")?.cgColor
+    button.layer.cornerRadius = 5
+    return button
+  }()
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -78,10 +121,13 @@ class MainView: UIView {
     setupSegmentedControl()
     setupSegmentedControlConstraints()
     setupCollectionViewConstraint()
+    setupPagingButtonConstraints()
+    setupPagingControlConstraints()
     makeTableView()
     tableViewConstraints()
-    setupButtonsStackView()
-
+    setupButtonsStackViewConstraint()
+    
+    
   }
   
   required init?(coder: NSCoder) {
@@ -89,8 +135,9 @@ class MainView: UIView {
   }
   
   func configureUI() {
-    [logo, searchTextField, clearButton, searchButton, segmentedControl, menuCollectionView, stackView, tableView, allCount, payLabel, tableView, orderQuantity, totalAmount].forEach { self.addSubview($0)}
+    [logo, searchTextField, clearButton, searchButton, segmentedControl, menuCollectionView, stackView, tableView, allCount, payLabel, tableView, orderQuantity, totalAmount, showNextMenu, showPreviousMenu, pageControl, buttonStackView].forEach { self.addSubview($0)}
     [productNameLabel, quantityLabel, amount].forEach {stackView.addArrangedSubview($0)}
+    [cancelButton, orderButton].forEach {buttonStackView.addArrangedSubview($0)}
   }
   
   func logoConstraints() {
@@ -122,12 +169,7 @@ class MainView: UIView {
   /// UISegmentedControl을 설정하고 초기 선택 색상을 지정하는 메서드
   private func setupSegmentedControl() {
     segmentedControl.selectedSegmentIndex = 0
-    segmentedControl.selectedSegmentTintColor = UIColor(
-      red: 217/255,
-      green: 69/255,
-      blue: 81/255,
-      alpha: 0.5
-    )
+    segmentedControl.selectedSegmentTintColor = UIColor(named: "spaColor")
   }
   
   /// setupSegmentedControlConstraints: UISegmentedControl의 제약 조건을 설정하는 메서드
@@ -145,7 +187,29 @@ class MainView: UIView {
       $0.leading.equalTo(self.safeAreaLayoutGuide.snp.leading).offset(40)
       $0.trailing.equalTo(self.safeAreaLayoutGuide.snp.trailing).offset(-40)
       $0.top.equalTo(segmentedControl.snp.bottom).offset(20)
-      $0.bottom.equalTo(stackView.snp.top).offset(-20)
+      $0.bottom.equalTo(pageControl.snp.top)
+    }
+  }
+  
+  func setupPagingButtonConstraints() {
+    showNextMenu.snp.makeConstraints {
+      $0.trailing.equalToSuperview()
+      $0.leading.equalTo(menuCollectionView.snp.trailing)
+      $0.top.equalToSuperview().inset(350)
+    }
+    
+    showPreviousMenu.snp.makeConstraints {
+      $0.leading.equalToSuperview()
+      $0.trailing.equalTo(menuCollectionView.snp.leading)
+      $0.top.equalToSuperview().inset(350)
+    }
+  }
+  
+  func setupPagingControlConstraints() {
+    pageControl.snp.makeConstraints {
+      $0.top.equalTo(menuCollectionView.snp.bottom)
+      $0.centerX.equalToSuperview()
+      $0.bottom.equalTo(stackView.snp.top)
     }
   }
   
@@ -162,7 +226,7 @@ class MainView: UIView {
     payLabel.layer.borderWidth = 1.0
     payLabel.textAlignment = .center
     payLabel.layer.borderColor = UIColor.red.cgColor
-
+    
     productNameLabel.text = "제품명"
     quantityLabel.text = "수량"
     amount.text = "금액"
@@ -208,63 +272,15 @@ class MainView: UIView {
   }
   
   // MARK: - UIStackView (Developer: 최건)
-
+  
   /// cancelButton과 orderButton을 stackView에 추가 & layout
-  private func setupButtonsStackView() {
-    let cancelButton = createCancelButton()
-    let orderButton = createOrderButton()
-    let stackView = UIStackView(arrangedSubviews: [cancelButton, orderButton])
-    stackView.axis = .horizontal
-    stackView.alignment = .fill
-    stackView.distribution = .fillEqually
-    stackView.spacing = 10
-
-    self.addSubview(stackView)
-
-    stackView.snp.makeConstraints {
+  func setupButtonsStackViewConstraint() {
+    buttonStackView.snp.makeConstraints {
       $0.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottom)
       $0.leading.equalTo(self.safeAreaLayoutGuide.snp.leading).offset(20)
       $0.trailing.equalTo(self.safeAreaLayoutGuide.snp.trailing).offset(-20)
       $0.height.equalTo(50)
     }
-  }
-
-  /// cancelButton과 orderButton을 stackView에 추가 & layout
-  private func createOrderButton() -> UIButton {
-    let button = UIButton(type: .system)
-    button.setTitle("주문하기", for: .normal)
-    button.titleLabel?.font = UIFont(name: "HelveticaNeue-Bold", size: 20)
-    button.backgroundColor = UIColor(named: "spaColor")
-    button.setTitleColor(UIColor(named: "orderButtonTitle"), for: .normal)
-    button.layer.cornerRadius = 5
-    button.addTarget(self, action: #selector(orderButtonTapped), for: .touchUpInside)
-    return button
-  }
-
-  /// cancelButton 생성
-  /// - Returns: 생성한 버튼 리턴
-  private func createCancelButton() -> UIButton {
-    let button = UIButton(type: .system)
-    button.setTitle("취소", for: .normal)
-    button.titleLabel?.font = UIFont(name: "HelveticaNeue-Bold", size: 20)
-    button.backgroundColor = UIColor(named: "cancleButtonBackground")
-    button.setTitleColor(UIColor(named: "spaColor"), for: .normal)
-    button.layer.borderWidth = 1
-    button.layer.borderColor = UIColor(named: "spaColor")?.cgColor
-    button.layer.cornerRadius = 5
-    button.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
-    return button
-  }
-  
-  /// cancleButton 클릭
-  @objc private func cancelButtonTapped() {
-    delegate?.orderListClear()
-  }
-  
-  /// orderButton 클릭
-  /// 주문내역의 유무에 따른 메세지 표시
-  @objc private func orderButtonTapped() {
-    delegate?.clickedOrderButton()
   }
 }
 
