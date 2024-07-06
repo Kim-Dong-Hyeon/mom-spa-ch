@@ -20,9 +20,9 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   static let identifier = "mainViewController"
   private let countLabel = UILabel()
   private let nameLabel = UILabel()
+
   let cellCount = 4
   var currentIndex = 0
-
   // MARK: - UIViewController (Developer: 조수환)
   
   var mainView: MainView!
@@ -39,6 +39,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     setupCollectionView()
     setupActions()
     filteredMenuData = menuData.menuArray
+    setupGestureRecognizers()
   }
   
   private func setupActions() {
@@ -71,7 +72,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   
   @objc private func searchButtonTapped() {
     let searchText = mainView.searchTextField.text ?? ""
-
+    
     if searchText.isEmpty {
       filteredMenuData = menuData.menuArray
     } else {
@@ -87,14 +88,16 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         }
       }
     }
-
+    
     // 선택된 카테고리에 따라 다시 필터링
     if mainView.selectedCategory != "all" {
       filteredMenuData = filteredMenuData.filter { $0.category == mainView.selectedCategory }
     }
-
     mainView.menuCollectionView.reloadData()
     clearPagingControl()
+  }
+  @objc private func isItSearch() {
+    
   }
   
   // View or Controller 정하기
@@ -146,7 +149,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
       MenuCollectionViewCell.self,
       forCellWithReuseIdentifier: MenuCollectionViewCell.identifier)
   }
-
+  
   /// 컬렉션뷰 셀을 컬렉션 뷰 안에 넣기
   /// - Parameters:
   ///   - collectionView: 넣어야할 컬렉션뷰
@@ -162,18 +165,16 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     ) as? MenuCollectionViewCell else {
       return UICollectionViewCell()
     }
-////    let filteredMenu = filteredMenuData.filter {
-//      mainView.selectedCategory == "all" || $0.category == mainView.selectedCategory
-//    }
-//    let item = filteredMenu[indexPath.item]
+    
     let startIndex = currentIndex * cellCount
-        let item = filteredMenuData[startIndex + indexPath.item]
+    let item = filteredMenuData[startIndex + indexPath.item]
+
     cell.configure(withImageName: item.imageName, price: item.menuPrice, name: item.menuName)
     
     cell.delegate = self
     return cell
   }
-
+  
   /// 컬렉션 뷰 내부 셀구성 개수 설정
   /// - Returns: 개수
   func collectionView(
@@ -231,8 +232,9 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     mainView.pageControl.numberOfPages = (filteredMenuData.count + cellCount - 1) / cellCount
     mainView.pageControl.currentPage = 0
   }
+                        
   // MARK: - UITableView (Developer: 백시훈)
-
+  
   /// addOrderList
   /// - Parameters: 메뉴에서 버튼을 눌러 주문리스트에 추가하는 함수
   ///   - pay: 금액
@@ -267,7 +269,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
       mainView.tableView.scrollToRow(at: indexPath, at: .bottom, animated: animated)
     }
   }
-
+  
   /// setupTableView: 테이블 뷰 생성
   func setupTableView() {
     mainView.tableView.dataSource = self
@@ -275,7 +277,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     mainView.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
     mainView.tableView.register(CustomTableViewCell.self, forCellReuseIdentifier: "CustomCell") // 셀 등록
   }
-
+  
   /// tableView: 테이블 뷰의 cell을 갯수를 리턴하는 메서드
   /// - Parameters:
   ///   - tableView: 테이블 뷰
@@ -284,7 +286,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     return menuData.nameData.count
   }
-
+  
   /// tableView: 테이블 뷰 구성요소 데이터 넣는 메서드
   /// - Parameters:
   ///   - tableView: 테이블 뷰
@@ -305,7 +307,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     cell.delegate = self
     return cell
   }
-
+  
   /// deleteButton: cell에서 삭제된 데이터 처리
   /// - Parameter cell: 삭제 cell
   func deleteButton(in cell: CustomTableViewCell) {
@@ -318,14 +320,14 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
       mainView.payLabel.text = String(menuData.priceData.reduce(0, +))
     }
   }
-
+  
   /// plusButtonTap: 플러스 버튼시 이벤트
   /// - Parameter cell: 플러스 버튼 누른 cell
   func plusButtonTap(in cell: CustomTableViewCell) {
     guard let indexPath = mainView.tableView.indexPath(for: cell) else {
       return
     }
-
+    
     if let cell = mainView.tableView.cellForRow(
       at: indexPath
     ) as? CustomTableViewCell, let countText = cell.itemNameLabel.text {
@@ -342,7 +344,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     mainView.allCount.text = String(menuData.countSum)
     mainView.payLabel.text = String(menuData.paySum)
   }
-
+  
   /// minusButtonTap : 마이너스 버튼 클릭 이벤트 메서드
   /// - Parameter cell: 마이너스 버튼 누른 cell
   func minusButtonTap(in cell: CustomTableViewCell) {
@@ -351,7 +353,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     if let cell = mainView.tableView.cellForRow(at: indexPath) as? CustomTableViewCell,
        let countText = cell.itemNameLabel.text {
-
+      
       for i in 0..<menuData.nameData.count {
         if menuData.nameData[i] == countText {
           let count = Int(menuData.countData[i])
@@ -373,7 +375,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   @objc func orderButtonTapped() {
     clickedOrderButton()
   }
-
   /// 주문 내역을 처음 상태로 초기화
   func orderListClear() {
     menuData.nameData = []
@@ -409,7 +410,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
       present(alert, animated: true, completion: nil)
     }
   }
-
+  
   /// 최종 주문 완료 메세지
   private func orderCompletedAlert() {
     let completedAlert = UIAlertController(
@@ -422,4 +423,97 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     orderListClear()
     present(completedAlert, animated: true, completion: nil)
   }
+  
+  private func setupGestureRecognizers() {
+    let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(_:)))
+    swipeLeft.direction = .left
+    mainView.menuCollectionView.addGestureRecognizer(swipeLeft)
+    
+    let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(_:)))
+    swipeRight.direction = .right
+    mainView.menuCollectionView.addGestureRecognizer(swipeRight)
+  }
+  
+  
+  @objc private func handleSwipe(_ gesture: UISwipeGestureRecognizer) {
+    switch gesture.direction {
+    case .left:
+        if let nextCategoryIndex = getNextCategory(after: mainView.selectedCategory) {
+            updateCategory(to: nextCategoryIndex)
+        }
+    case .right:
+        if let previousCategoryIndex = getPreviousCategory(before: mainView.selectedCategory) {
+            updateCategory(to: previousCategoryIndex)
+        }
+    default:
+        break
+    }
+  }
+
+  private func updateCategory(to newIndex: Int) {
+    let categories = ["all", "burger", "chicken", "sideMenu", "drink"]
+    mainView.segmentedControl.selectedSegmentIndex = newIndex
+    mainView.selectedCategory = categories[newIndex]
+//    if didSearch == false {
+//      filterMenuData()
+//    }
+//    mainView.menuCollectionView.reloadData()
+//    if didSearch == false || !filteredMenuData.isEmpty {
+//      mainView.menuCollectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: true)
+//    }
+    let searchText = mainView.searchTextField.text ?? ""
+    
+    if searchText.isEmpty {
+      filteredMenuData = menuData.menuArray
+    } else {
+      filteredMenuData = menuData.menuArray.filter { menuItem in
+        if searchText.range(of: "\\p{Hangul}", options: .regularExpression) != nil {
+          // 검색어에 한글이 포함된 경우 menuName과 비교
+          let containsMenuName = menuItem.menuName.contains(searchText)
+          return containsMenuName
+        } else {
+          // 검색어에 한글이 포함되지 않은 경우 imageName과 비교
+          let containsImageName = menuItem.imageName.lowercased().contains(searchText.lowercased())
+          return containsImageName
+        }
+      }
+    }
+    
+    // 선택된 카테고리에 따라 다시 필터링
+    if mainView.selectedCategory != "all" {
+      filteredMenuData = filteredMenuData.filter { $0.category == mainView.selectedCategory }
+    }
+    
+    mainView.menuCollectionView.reloadData()
+    
+    if !filteredMenuData.isEmpty {
+      mainView.menuCollectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: true)
+    }
+  }
+
+  private func getNextCategory(after currentCategory: String) -> Int? {
+    let categories = ["all", "burger", "chicken", "sideMenu", "drink"]
+    if let currentIndex = categories.firstIndex(of: currentCategory) {
+      let nextIndex = (currentIndex + 1) % categories.count
+      return nextIndex
+    }
+    return nil
+  }
+  
+  private func getPreviousCategory(before currentCategory: String) -> Int? {
+    let categories = ["all", "burger", "chicken", "sideMenu", "drink"]
+    if let currentIndex = categories.firstIndex(of: currentCategory) {
+      let previousIndex = (currentIndex - 1 + categories.count) % categories.count
+      return previousIndex
+    }
+    return nil
+  }
+  
+  private func filterMenuData() {
+    filteredMenuData = menuData.menuArray
+    if mainView.selectedCategory != "all" {
+      filteredMenuData = filteredMenuData.filter { $0.category == mainView.selectedCategory }
+    }
+  }
 }
+

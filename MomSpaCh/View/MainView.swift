@@ -38,7 +38,6 @@ class MainView: UIView {
   let clearButton: UIButton = {
     let button = UIButton(type: .custom)
     button.setImage(UIImage(systemName: "multiply.circle.fill"), for: .normal)
-    
     button.tintColor = UIColor(named: "spaColor")
     return button
   }()
@@ -284,3 +283,5 @@ class MainView: UIView {
     }
   }
 }
+
+
