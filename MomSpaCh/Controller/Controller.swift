@@ -87,8 +87,10 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     if mainView.selectedCategory != "all" {
       filteredMenuData = filteredMenuData.filter { $0.category == mainView.selectedCategory }
     }
-    
     mainView.menuCollectionView.reloadData()
+  }
+  @objc private func isItSearch() {
+    
   }
   
   // View or Controller 정하기
@@ -437,7 +439,41 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     let categories = ["all", "burger", "chicken", "sideMenu", "drink"]
     mainView.segmentedControl.selectedSegmentIndex = newIndex
     mainView.selectedCategory = categories[newIndex]
+//    if didSearch == false {
+//      filterMenuData()
+//    }
+//    mainView.menuCollectionView.reloadData()
+//    if didSearch == false || !filteredMenuData.isEmpty {
+//      mainView.menuCollectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: true)
+//    }
+    let searchText = mainView.searchTextField.text ?? ""
+    
+    if searchText.isEmpty {
+      filteredMenuData = menuData.menuArray
+    } else {
+      filteredMenuData = menuData.menuArray.filter { menuItem in
+        if searchText.range(of: "\\p{Hangul}", options: .regularExpression) != nil {
+          // 검색어에 한글이 포함된 경우 menuName과 비교
+          let containsMenuName = menuItem.menuName.contains(searchText)
+          return containsMenuName
+        } else {
+          // 검색어에 한글이 포함되지 않은 경우 imageName과 비교
+          let containsImageName = menuItem.imageName.lowercased().contains(searchText.lowercased())
+          return containsImageName
+        }
+      }
+    }
+    
+    // 선택된 카테고리에 따라 다시 필터링
+    if mainView.selectedCategory != "all" {
+      filteredMenuData = filteredMenuData.filter { $0.category == mainView.selectedCategory }
+    }
+    
     mainView.menuCollectionView.reloadData()
+    
+    if !filteredMenuData.isEmpty {
+      mainView.menuCollectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: true)
+    }
   }
 
   private func getNextCategory(after currentCategory: String) -> Int? {
@@ -456,6 +492,13 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
       return previousIndex
     }
     return nil
+  }
+  
+  private func filterMenuData() {
+    filteredMenuData = menuData.menuArray
+    if mainView.selectedCategory != "all" {
+      filteredMenuData = filteredMenuData.filter { $0.category == mainView.selectedCategory }
+    }
   }
 }
 
