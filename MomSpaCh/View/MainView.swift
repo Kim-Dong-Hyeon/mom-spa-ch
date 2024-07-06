@@ -78,7 +78,7 @@ class MainView: UIView {
     self.backgroundColor = .systemBackground
     configureUI()
     logoConstraints()
-    setupSearchUI()
+    setupSearchConstraints()
     setupSegmentedControl()
     setupSegmentedControlConstraints()
     setupCollectionViewConstraint()
@@ -106,7 +106,7 @@ class MainView: UIView {
     }
   }
   
-  func setupSearchUI() {
+  func setupSearchConstraints() {
     searchTextField.snp.makeConstraints {
       $0.leading.equalTo(logo.snp.trailing).offset(10)
       $0.centerY.equalTo(logo.snp.centerY)
