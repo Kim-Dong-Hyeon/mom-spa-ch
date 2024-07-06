@@ -10,7 +10,6 @@ struct MenuItem {
   let imageName: String
   let menuName: String
   let menuPrice: Int
-  let orderCount
 }
 
 struct MenuData {
