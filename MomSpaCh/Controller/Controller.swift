@@ -12,7 +12,7 @@ import SnapKit
 class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate,
                       CustomTableViewCellDelegate, UICollectionViewDelegate,
                       MenuCollectionViewCellDelegate, UICollectionViewDataSource,
-                      UICollectionViewDelegateFlowLayout, MainViewDelegate {
+                      UICollectionViewDelegateFlowLayout {
   
   var checkDuplication: Bool = false
   var menuData = MenuData()
@@ -29,7 +29,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   override func loadView() {
     super.loadView()
     mainView = MainView(frame: self.view.frame)
-    mainView.delegate = self
     self.view = mainView
   }
   
@@ -48,6 +47,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     mainView.segmentedControl.addTarget(self, action: #selector(categoryChanged(_:)), for: .valueChanged)
     mainView.showNextMenu.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
     mainView.showPreviousMenu.addTarget(self, action: #selector(previousButtonTapped), for: .touchUpInside)
+    mainView.cancelButton.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
+    mainView.orderButton.addTarget(self, action: #selector(orderButtonTapped), for: .touchUpInside)
   }
   
   private func setupSearchTextField() {
@@ -363,6 +364,14 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
       mainView.allCount.text = String(menuData.countSum)
       mainView.payLabel.text = String(menuData.paySum)
     }
+  }
+  
+  @objc func cancelButtonTapped() {
+    orderListClear()
+  }
+  
+  @objc func orderButtonTapped() {
+    clickedOrderButton()
   }
 
   /// 주문 내역을 처음 상태로 초기화

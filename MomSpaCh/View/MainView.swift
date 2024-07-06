@@ -9,13 +9,7 @@ import UIKit
 
 import SnapKit
 
-protocol MainViewDelegate: AnyObject {
-  func orderListClear()
-  func clickedOrderButton()
-}
-
 class MainView: UIView {
-  weak var delegate: MainViewDelegate?
   var selectedCategory = "all"
   let allCount = UILabel()
   let amount = UILabel()
@@ -88,6 +82,37 @@ class MainView: UIView {
     return collectionView
   }()
   
+  let buttonStackView: UIStackView = {
+    let stackView = UIStackView()
+    stackView.axis = .horizontal
+    stackView.alignment = .fill
+    stackView.distribution = .fillEqually
+    stackView.spacing = 10
+    return stackView
+  }()
+  
+  var orderButton: UIButton = {
+    let button = UIButton(type: .system)
+    button.setTitle("주문하기", for: .normal)
+    button.titleLabel?.font = UIFont(name: "HelveticaNeue-Bold", size: 20)
+    button.backgroundColor = UIColor(named: "spaColor")
+    button.setTitleColor(UIColor(named: "orderButtonTitle"), for: .normal)
+    button.layer.cornerRadius = 5
+    return button
+  }()
+  
+  var cancelButton: UIButton = {
+    let button = UIButton(type: .system)
+    button.setTitle("취소", for: .normal)
+    button.titleLabel?.font = UIFont(name: "HelveticaNeue-Bold", size: 20)
+    button.backgroundColor = UIColor(named: "cancleButtonBackground")
+    button.setTitleColor(UIColor(named: "spaColor"), for: .normal)
+    button.layer.borderWidth = 1
+    button.layer.borderColor = UIColor(named: "spaColor")?.cgColor
+    button.layer.cornerRadius = 5
+    return button
+  }()
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     self.backgroundColor = .systemBackground
@@ -101,7 +126,8 @@ class MainView: UIView {
     setupPagingControlConstraints()
     makeTableView()
     tableViewConstraints()
-    setupButtonsStackView()
+    setupButtonsStackViewConstraint()
+    
     
   }
   
@@ -110,8 +136,9 @@ class MainView: UIView {
   }
   
   func configureUI() {
-    [logo, searchTextField, clearButton, searchButton, segmentedControl, menuCollectionView, stackView, tableView, allCount, payLabel, tableView, orderQuantity, totalAmount, showNextMenu, showPreviousMenu, pageControl].forEach { self.addSubview($0)}
+    [logo, searchTextField, clearButton, searchButton, segmentedControl, menuCollectionView, stackView, tableView, allCount, payLabel, tableView, orderQuantity, totalAmount, showNextMenu, showPreviousMenu, pageControl, buttonStackView].forEach { self.addSubview($0)}
     [productNameLabel, quantityLabel, amount].forEach {stackView.addArrangedSubview($0)}
+    [cancelButton, orderButton].forEach {buttonStackView.addArrangedSubview($0)}
   }
   
   func logoConstraints() {
@@ -248,60 +275,12 @@ class MainView: UIView {
   // MARK: - UIStackView (Developer: 최건)
   
   /// cancelButton과 orderButton을 stackView에 추가 & layout
-  private func setupButtonsStackView() {
-    let cancelButton = createCancelButton()
-    let orderButton = createOrderButton()
-    let stackView = UIStackView(arrangedSubviews: [cancelButton, orderButton])
-    stackView.axis = .horizontal
-    stackView.alignment = .fill
-    stackView.distribution = .fillEqually
-    stackView.spacing = 10
-    
-    self.addSubview(stackView)
-    
-    stackView.snp.makeConstraints {
+  func setupButtonsStackViewConstraint() {
+    buttonStackView.snp.makeConstraints {
       $0.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottom)
       $0.leading.equalTo(self.safeAreaLayoutGuide.snp.leading).offset(20)
       $0.trailing.equalTo(self.safeAreaLayoutGuide.snp.trailing).offset(-20)
       $0.height.equalTo(50)
     }
-  }
-  
-  /// cancelButton과 orderButton을 stackView에 추가 & layout
-  private func createOrderButton() -> UIButton {
-    let button = UIButton(type: .system)
-    button.setTitle("주문하기", for: .normal)
-    button.titleLabel?.font = UIFont(name: "HelveticaNeue-Bold", size: 20)
-    button.backgroundColor = UIColor(named: "spaColor")
-    button.setTitleColor(UIColor(named: "orderButtonTitle"), for: .normal)
-    button.layer.cornerRadius = 5
-    button.addTarget(self, action: #selector(orderButtonTapped), for: .touchUpInside)
-    return button
-  }
-  
-  /// cancelButton 생성
-  /// - Returns: 생성한 버튼 리턴
-  private func createCancelButton() -> UIButton {
-    let button = UIButton(type: .system)
-    button.setTitle("취소", for: .normal)
-    button.titleLabel?.font = UIFont(name: "HelveticaNeue-Bold", size: 20)
-    button.backgroundColor = UIColor(named: "cancleButtonBackground")
-    button.setTitleColor(UIColor(named: "spaColor"), for: .normal)
-    button.layer.borderWidth = 1
-    button.layer.borderColor = UIColor(named: "spaColor")?.cgColor
-    button.layer.cornerRadius = 5
-    button.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
-    return button
-  }
-  
-  /// cancleButton 클릭
-  @objc private func cancelButtonTapped() {
-    delegate?.orderListClear()
-  }
-  
-  /// orderButton 클릭
-  /// 주문내역의 유무에 따른 메세지 표시
-  @objc private func orderButtonTapped() {
-    delegate?.clickedOrderButton()
   }
 }
