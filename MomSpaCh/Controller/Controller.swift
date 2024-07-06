@@ -95,9 +95,12 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     mainView.menuCollectionView.reloadData()
     clearPagingControl()
-  }
-  @objc private func isItSearch() {
     
+    // 검색 결과가 없을 때 처리 추가
+    if filteredMenuData.isEmpty {
+      mainView.pageControl.numberOfPages = 0
+      mainView.pageControl.currentPage = 0
+    }
   }
   
   // View or Controller 정하기
@@ -231,6 +234,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   func clearPagingControl() {
     mainView.pageControl.numberOfPages = (filteredMenuData.count + cellCount - 1) / cellCount
     mainView.pageControl.currentPage = 0
+    currentIndex = 0
   }
                         
   // MARK: - UITableView (Developer: 백시훈)
@@ -454,13 +458,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     let categories = ["all", "burger", "chicken", "sideMenu", "drink"]
     mainView.segmentedControl.selectedSegmentIndex = newIndex
     mainView.selectedCategory = categories[newIndex]
-//    if didSearch == false {
-//      filterMenuData()
-//    }
-//    mainView.menuCollectionView.reloadData()
-//    if didSearch == false || !filteredMenuData.isEmpty {
-//      mainView.menuCollectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: true)
-//    }
     let searchText = mainView.searchTextField.text ?? ""
     
     if searchText.isEmpty {
@@ -484,11 +481,16 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
       filteredMenuData = filteredMenuData.filter { $0.category == mainView.selectedCategory }
     }
     
+    currentIndex = 0
+    
     mainView.menuCollectionView.reloadData()
     
     if !filteredMenuData.isEmpty {
-      mainView.menuCollectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: true)
+      mainView.menuCollectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .left, animated: true)
     }
+    
+    mainView.pageControl.numberOfPages = (filteredMenuData.count + cellCount - 1) / cellCount
+    mainView.pageControl.currentPage = 0
   }
 
   private func getNextCategory(after currentCategory: String) -> Int? {
