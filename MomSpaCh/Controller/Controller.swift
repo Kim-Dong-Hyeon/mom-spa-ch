@@ -33,14 +33,67 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   
   override func viewDidLoad() {
     super.viewDidLoad()
+    setupSearchTextField()
     setupTableView()
     setupCollectionView()
+    mainView.clearButton.addTarget(self, action: #selector(clearSearchText), for: .touchUpInside)
     mainView.searchButton.addTarget(self, action: #selector(searchButtonTapped), for: .touchUpInside)
     mainView.segmentedControl.addTarget(self, action: #selector(categoryChanged(_:)), for: .valueChanged)
     filteredMenuData = menuData.menuArray
   }
   
+  private func setupSearchTextField() {
+    mainView.searchTextField.rightView = mainView.clearButton
+    mainView.searchTextField.rightViewMode = .whileEditing
+  }
+  
+  @objc private func clearSearchText() {
+    mainView.searchTextField.text = ""
+    filteredMenuData = menuData.menuArray
+    
+    // 선택된 카테고리에 따라 다시 필터링
+    if mainView.selectedCategory != "all" {
+      filteredMenuData = filteredMenuData.filter { $0.category == mainView.selectedCategory }
+    }
+    
+    mainView.menuCollectionView.reloadData()
+  }
+  
   @objc private func searchButtonTapped() {
+    let searchText = mainView.searchTextField.text ?? ""
+
+    if searchText.isEmpty {
+      filteredMenuData = menuData.menuArray
+    } else {
+      filteredMenuData = menuData.menuArray.filter { menuItem in
+        if searchText.range(of: "\\p{Hangul}", options: .regularExpression) != nil {
+          // 검색어에 한글이 포함된 경우 menuName과 비교
+          let containsMenuName = menuItem.menuName.contains(searchText)
+          return containsMenuName
+        } else {
+          // 검색어에 한글이 포함되지 않은 경우 imageName과 비교
+          let containsImageName = menuItem.imageName.lowercased().contains(searchText.lowercased())
+          return containsImageName
+        }
+      }
+    }
+
+    // 선택된 카테고리에 따라 다시 필터링
+    if mainView.selectedCategory != "all" {
+      filteredMenuData = filteredMenuData.filter { $0.category == mainView.selectedCategory }
+    }
+
+    mainView.menuCollectionView.reloadData()
+  }
+  
+  // View or Controller 정하기
+  /// categoryChanged: UISegmentedControl의 값이 변경되었을 때 호출되는 메서드
+  /// - Parameter sender: UISegmentedControl
+  @objc private func categoryChanged(_ sender: UISegmentedControl) {
+    //    mainView.selectedCategory = mainView.segmentedControl.titleForSegment(at: sender.selectedSegmentIndex) ?? "전체"
+    let selectedCategoryKorean = mainView.segmentedControl.titleForSegment(at: sender.selectedSegmentIndex) ?? "전체"
+    mainView.selectedCategory = menuData.categoryMapping[selectedCategoryKorean] ?? "all"
+    
     let searchText = mainView.searchTextField.text ?? ""
     
     if searchText.isEmpty {
@@ -58,17 +111,14 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         }
       }
     }
+    
+    // 선택된 카테고리에 따라 다시 필터링
+    if mainView.selectedCategory != "all" {
+      filteredMenuData = filteredMenuData.filter { $0.category == mainView.selectedCategory }
+    }
+    
     mainView.menuCollectionView.reloadData()
-  }
-  
-  // View or Controller 정하기
-  /// categoryChanged: UISegmentedControl의 값이 변경되었을 때 호출되는 메서드
-  /// - Parameter sender: UISegmentedControl
-  @objc private func categoryChanged(_ sender: UISegmentedControl) {
-//    mainView.selectedCategory = mainView.segmentedControl.titleForSegment(at: sender.selectedSegmentIndex) ?? "전체"
-    let selectedCategoryKorean = mainView.segmentedControl.titleForSegment(at: sender.selectedSegmentIndex) ?? "전체"
-    mainView.selectedCategory = menuData.categoryMapping[selectedCategoryKorean] ?? "all"
-    mainView.menuCollectionView.reloadData()
+    
     if !filteredMenuData.isEmpty {
       mainView.menuCollectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: true)
     }
@@ -193,6 +243,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     mainView.allCount.text = String(menuData.countData.reduce(0, +))
     mainView.payLabel.text = String(menuData.priceData.reduce(0, +))
     mainView.tableView.reloadData()
+    
   }
 
   /// setupTableView: 테이블 뷰 생성

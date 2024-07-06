@@ -41,9 +41,27 @@ class MainView: UIView {
     return textField
   }()
   
+  let clearButton: UIButton = {
+    let button = UIButton(type: .custom)
+    button.setImage(UIImage(systemName: "multiply.circle.fill"), for: .normal)
+    button.tintColor = UIColor(
+      red: 217/255,
+      green: 69/255,
+      blue: 81/255,
+      alpha: 0.5
+    )
+    return button
+  }()
+  
   let searchButton: UIButton = {
     let button = UIButton(type: .system)
     button.setImage(UIImage(systemName: "magnifyingglass"), for: .normal)
+    button.tintColor = UIColor(
+      red: 217/255,
+      green: 69/255,
+      blue: 81/255,
+      alpha: 0.5
+    )
     return button
   }()
   
@@ -75,7 +93,7 @@ class MainView: UIView {
   }
   
   func configureUI() {
-    [logo, searchTextField, searchButton, segmentedControl, menuCollectionView, stackView, tableView, allCount, payLabel, tableView, orderQuantity, totalAmount].forEach { self.addSubview($0)}
+    [logo, searchTextField, clearButton, searchButton, segmentedControl, menuCollectionView, stackView, tableView, allCount, payLabel, tableView, orderQuantity, totalAmount].forEach { self.addSubview($0)}
     [productNameLabel, quantityLabel, amount].forEach {stackView.addArrangedSubview($0)}
   }
   
