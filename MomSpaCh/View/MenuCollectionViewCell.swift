@@ -30,12 +30,14 @@ class MenuCollectionViewCell: UICollectionViewCell {
   private let priceLabel: UILabel = {
     var priceLabel = UILabel()
     priceLabel.font = UIFont.boldSystemFont(ofSize: 15)
+    priceLabel.textAlignment = .center
     return priceLabel
   }()
   
   private let nameLabel: UILabel = {
     var nameLabel = UILabel()
     nameLabel.font = UIFont.boldSystemFont(ofSize: 15)
+    nameLabel.textAlignment = .center
     return nameLabel
   }()
   

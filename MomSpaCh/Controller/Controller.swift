@@ -20,6 +20,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   static let identifier = "mainViewController"
   private let countLabel = UILabel()
   private let nameLabel = UILabel()
+  let cellCount = 4
+  var currentIndex = 0
 
   // MARK: - UIViewController (Developer: 조수환)
   
@@ -44,6 +46,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     mainView.clearButton.addTarget(self, action: #selector(clearSearchText), for: .touchUpInside)
     mainView.searchButton.addTarget(self, action: #selector(searchButtonTapped), for: .touchUpInside)
     mainView.segmentedControl.addTarget(self, action: #selector(categoryChanged(_:)), for: .valueChanged)
+    mainView.showNextMenu.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
+    mainView.showPreviousMenu.addTarget(self, action: #selector(previousButtonTapped), for: .touchUpInside)
   }
   
   private func setupSearchTextField() {
@@ -61,6 +65,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     
     mainView.menuCollectionView.reloadData()
+    clearPagingControl()
   }
   
   @objc private func searchButtonTapped() {
@@ -88,12 +93,14 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
 
     mainView.menuCollectionView.reloadData()
+    clearPagingControl()
   }
   
   // View or Controller 정하기
   /// categoryChanged: UISegmentedControl의 값이 변경되었을 때 호출되는 메서드
   /// - Parameter sender: UISegmentedControl
   @objc private func categoryChanged(_ sender: UISegmentedControl) {
+    currentIndex = 0
     //    mainView.selectedCategory = mainView.segmentedControl.titleForSegment(at: sender.selectedSegmentIndex) ?? "전체"
     let selectedCategoryKorean = mainView.segmentedControl.titleForSegment(at: sender.selectedSegmentIndex) ?? "전체"
     mainView.selectedCategory = menuData.categoryMapping[selectedCategoryKorean] ?? "all"
@@ -122,6 +129,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     
     mainView.menuCollectionView.reloadData()
+    clearPagingControl()
     
     if !filteredMenuData.isEmpty {
       mainView.menuCollectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: true)
@@ -153,36 +161,12 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     ) as? MenuCollectionViewCell else {
       return UICollectionViewCell()
     }
-
-//    switch mainView.selectedCategory {
-//    case "버거":
-//      let burgerItem = menuData.menuArray.filter { $0.category == "burger" }
-//      let item = burgerItem[indexPath.row]
-//      cell.configure(withImageName: item.imageName, price: item.menuPrice, name: item.menuName)
-//
-//    case "치킨":
-//      let chickenItem = menuData.menuArray.filter { $0.category == "chicken" }
-//      let item = chickenItem[indexPath.row]
-//      cell.configure(withImageName: item.imageName, price: item.menuPrice, name: item.menuName)
-//
-//    case "사이드":
-//      let sideMenuItem = menuData.menuArray.filter { $0.category == "sideMenu" }
-//      let item = sideMenuItem[indexPath.row]
-//      cell.configure(withImageName: item.imageName, price: item.menuPrice, name: item.menuName)
-//
-//    case "음료":
-//      let drinkItem = menuData.menuArray.filter { $0.category == "drink" }
-//      let item = drinkItem[indexPath.row]
-//      cell.configure(withImageName: item.imageName, price: item.menuPrice, name: item.menuName)
-//
-//    default:
-//      let item = menuData.menuArray[indexPath.row]
-//      cell.configure(withImageName: item.imageName, price: item.menuPrice, name: item.menuName)
+////    let filteredMenu = filteredMenuData.filter {
+//      mainView.selectedCategory == "all" || $0.category == mainView.selectedCategory
 //    }
-    let filteredMenu = filteredMenuData.filter {
-      mainView.selectedCategory == "all" || $0.category == mainView.selectedCategory
-    }
-    let item = filteredMenu[indexPath.item]
+//    let item = filteredMenu[indexPath.item]
+    let startIndex = currentIndex * cellCount
+        let item = filteredMenuData[startIndex + indexPath.item]
     cell.configure(withImageName: item.imageName, price: item.menuPrice, name: item.menuName)
     
     cell.delegate = self
@@ -195,21 +179,10 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     _ collectionView: UICollectionView,
     numberOfItemsInSection section: Int
   ) -> Int {
-//    switch mainView.selectedCategory {
-//    case "버거":
-//      return menuData.menuArray.filter { $0.category == "burger" }.count
-//    case "치킨":
-//      return menuData.menuArray.filter { $0.category == "chicken" }.count
-//    case "사이드":
-//      return menuData.menuArray.filter { $0.category == "sideMenu" }.count
-//    case "음료":
-//      return menuData.menuArray.filter { $0.category == "drink" }.count
-//    default:
-//      return menuData.menuArray.count
-//    }
     let filteredMenu = filteredMenuData.filter { mainView.selectedCategory == "all" || $0.category == mainView.selectedCategory }
-    
-    return filteredMenu.count
+    let firstCell = currentIndex * cellCount
+    let lastCell = min(firstCell + cellCount, filteredMenu.count)
+    return lastCell - firstCell
   }
   
   /// collectionView 제약 조건
@@ -219,9 +192,44 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     layout collectionViewLayout: UICollectionViewLayout,
     sizeForItemAt indexPath: IndexPath
   ) -> CGSize {
-    return CGSize(width: 130, height: 170)
+    return CGSize(width: 130, height: 150)
   }
-
+  
+  @objc func nextButtonTapped() {
+    let totalPages = (filteredMenuData.count + cellCount - 1) / cellCount
+    if currentIndex < totalPages - 1{
+      currentIndex += 1
+      mainView.menuCollectionView.reloadData()
+      mainView.pageControl.currentPage = currentIndex
+      buttonUpdate()
+    }
+  }
+  
+  @objc func previousButtonTapped() {
+    if currentIndex > 0 {
+      currentIndex -= 1
+      mainView.menuCollectionView.reloadData()
+      mainView.pageControl.currentPage = currentIndex
+      buttonUpdate()
+    }
+  }
+  
+  func buttonUpdate() {
+    let totalPages = (filteredMenuData.count + cellCount - 1) / cellCount
+    if currentIndex < totalPages - 1 {
+      mainView.showNextMenu.isEnabled = true
+    } else if (currentIndex > 0) {
+      mainView.showPreviousMenu.isEnabled = true
+    } else {
+      mainView.showNextMenu.isEnabled = false
+      mainView.showPreviousMenu.isEnabled = false
+    }
+  }
+  
+  func clearPagingControl() {
+    mainView.pageControl.numberOfPages = (filteredMenuData.count + cellCount - 1) / cellCount
+    mainView.pageControl.currentPage = 0
+  }
   // MARK: - UITableView (Developer: 백시훈)
 
   /// addOrderList
