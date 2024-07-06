@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  Controller.swift
 //  MomSpaCh
 //
 //  Created by 김동현 on 7/2/24.
@@ -16,6 +16,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   
   var checkDuplication: Bool = false
   var menuData = MenuData()
+  var filteredMenuData: [MenuItem] = []
   static let identifier = "mainViewController"
   private let countLabel = UILabel()
   private let nameLabel = UILabel()
@@ -32,8 +33,99 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   
   override func viewDidLoad() {
     super.viewDidLoad()
+    setupSearchTextField()
     setupTableView()
     setupCollectionView()
+    setupActions()
+    filteredMenuData = menuData.menuArray
+  }
+  
+  private func setupActions() {
+    mainView.clearButton.addTarget(self, action: #selector(clearSearchText), for: .touchUpInside)
+    mainView.searchButton.addTarget(self, action: #selector(searchButtonTapped), for: .touchUpInside)
+    mainView.segmentedControl.addTarget(self, action: #selector(categoryChanged(_:)), for: .valueChanged)
+  }
+  
+  private func setupSearchTextField() {
+    mainView.searchTextField.rightView = mainView.clearButton
+    mainView.searchTextField.rightViewMode = .whileEditing
+  }
+  
+  @objc private func clearSearchText() {
+    mainView.searchTextField.text = ""
+    filteredMenuData = menuData.menuArray
+    
+    // 선택된 카테고리에 따라 다시 필터링
+    if mainView.selectedCategory != "all" {
+      filteredMenuData = filteredMenuData.filter { $0.category == mainView.selectedCategory }
+    }
+    
+    mainView.menuCollectionView.reloadData()
+  }
+  
+  @objc private func searchButtonTapped() {
+    let searchText = mainView.searchTextField.text ?? ""
+
+    if searchText.isEmpty {
+      filteredMenuData = menuData.menuArray
+    } else {
+      filteredMenuData = menuData.menuArray.filter { menuItem in
+        if searchText.range(of: "\\p{Hangul}", options: .regularExpression) != nil {
+          // 검색어에 한글이 포함된 경우 menuName과 비교
+          let containsMenuName = menuItem.menuName.contains(searchText)
+          return containsMenuName
+        } else {
+          // 검색어에 한글이 포함되지 않은 경우 imageName과 비교
+          let containsImageName = menuItem.imageName.lowercased().contains(searchText.lowercased())
+          return containsImageName
+        }
+      }
+    }
+
+    // 선택된 카테고리에 따라 다시 필터링
+    if mainView.selectedCategory != "all" {
+      filteredMenuData = filteredMenuData.filter { $0.category == mainView.selectedCategory }
+    }
+
+    mainView.menuCollectionView.reloadData()
+  }
+  
+  // View or Controller 정하기
+  /// categoryChanged: UISegmentedControl의 값이 변경되었을 때 호출되는 메서드
+  /// - Parameter sender: UISegmentedControl
+  @objc private func categoryChanged(_ sender: UISegmentedControl) {
+    //    mainView.selectedCategory = mainView.segmentedControl.titleForSegment(at: sender.selectedSegmentIndex) ?? "전체"
+    let selectedCategoryKorean = mainView.segmentedControl.titleForSegment(at: sender.selectedSegmentIndex) ?? "전체"
+    mainView.selectedCategory = menuData.categoryMapping[selectedCategoryKorean] ?? "all"
+    
+    let searchText = mainView.searchTextField.text ?? ""
+    
+    if searchText.isEmpty {
+      filteredMenuData = menuData.menuArray
+    } else {
+      filteredMenuData = menuData.menuArray.filter { menuItem in
+        if searchText.range(of: "\\p{Hangul}", options: .regularExpression) != nil {
+          // 검색어에 한글이 포함된 경우 menuName과 비교
+          let containsMenuName = menuItem.menuName.contains(searchText)
+          return containsMenuName
+        } else {
+          // 검색어에 한글이 포함되지 않은 경우 imageName과 비교
+          let containsImageName = menuItem.imageName.lowercased().contains(searchText.lowercased())
+          return containsImageName
+        }
+      }
+    }
+    
+    // 선택된 카테고리에 따라 다시 필터링
+    if mainView.selectedCategory != "all" {
+      filteredMenuData = filteredMenuData.filter { $0.category == mainView.selectedCategory }
+    }
+    
+    mainView.menuCollectionView.reloadData()
+    
+    if !filteredMenuData.isEmpty {
+      mainView.menuCollectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .top, animated: true)
+    }
   }
   
   // MARK: - UICollectionView (Developer: 김윤홍)
@@ -62,31 +154,37 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
       return UICollectionViewCell()
     }
 
-    switch mainView.selectedCategory {
-    case "버거":
-      let burgerItem = menuData.menuArray.filter { $0.category == "burger" }
-      let item = burgerItem[indexPath.row]
-      cell.configure(withImageName: item.imageName, price: item.menuPrice, name: item.menuName)
-
-    case "치킨":
-      let chickenItem = menuData.menuArray.filter { $0.category == "chicken" }
-      let item = chickenItem[indexPath.row]
-      cell.configure(withImageName: item.imageName, price: item.menuPrice, name: item.menuName)
-
-    case "사이드":
-      let sideMenuItem = menuData.menuArray.filter { $0.category == "sideMenu" }
-      let item = sideMenuItem[indexPath.row]
-      cell.configure(withImageName: item.imageName, price: item.menuPrice, name: item.menuName)
-
-    case "음료":
-      let drinkItem = menuData.menuArray.filter { $0.category == "drink" }
-      let item = drinkItem[indexPath.row]
-      cell.configure(withImageName: item.imageName, price: item.menuPrice, name: item.menuName)
-
-    default:
-      let item = menuData.menuArray[indexPath.row]
-      cell.configure(withImageName: item.imageName, price: item.menuPrice, name: item.menuName)
+//    switch mainView.selectedCategory {
+//    case "버거":
+//      let burgerItem = menuData.menuArray.filter { $0.category == "burger" }
+//      let item = burgerItem[indexPath.row]
+//      cell.configure(withImageName: item.imageName, price: item.menuPrice, name: item.menuName)
+//
+//    case "치킨":
+//      let chickenItem = menuData.menuArray.filter { $0.category == "chicken" }
+//      let item = chickenItem[indexPath.row]
+//      cell.configure(withImageName: item.imageName, price: item.menuPrice, name: item.menuName)
+//
+//    case "사이드":
+//      let sideMenuItem = menuData.menuArray.filter { $0.category == "sideMenu" }
+//      let item = sideMenuItem[indexPath.row]
+//      cell.configure(withImageName: item.imageName, price: item.menuPrice, name: item.menuName)
+//
+//    case "음료":
+//      let drinkItem = menuData.menuArray.filter { $0.category == "drink" }
+//      let item = drinkItem[indexPath.row]
+//      cell.configure(withImageName: item.imageName, price: item.menuPrice, name: item.menuName)
+//
+//    default:
+//      let item = menuData.menuArray[indexPath.row]
+//      cell.configure(withImageName: item.imageName, price: item.menuPrice, name: item.menuName)
+//    }
+    let filteredMenu = filteredMenuData.filter {
+      mainView.selectedCategory == "all" || $0.category == mainView.selectedCategory
     }
+    let item = filteredMenu[indexPath.item]
+    cell.configure(withImageName: item.imageName, price: item.menuPrice, name: item.menuName)
+    
     cell.delegate = self
     return cell
   }
@@ -97,18 +195,21 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     _ collectionView: UICollectionView,
     numberOfItemsInSection section: Int
   ) -> Int {
-    switch mainView.selectedCategory {
-    case "버거":
-      return menuData.menuArray.filter { $0.category == "burger" }.count
-    case "치킨":
-      return menuData.menuArray.filter { $0.category == "chicken" }.count
-    case "사이드":
-      return menuData.menuArray.filter { $0.category == "sideMenu" }.count
-    case "음료":
-      return menuData.menuArray.filter { $0.category == "drink" }.count
-    default:
-      return menuData.menuArray.count
-    }
+//    switch mainView.selectedCategory {
+//    case "버거":
+//      return menuData.menuArray.filter { $0.category == "burger" }.count
+//    case "치킨":
+//      return menuData.menuArray.filter { $0.category == "chicken" }.count
+//    case "사이드":
+//      return menuData.menuArray.filter { $0.category == "sideMenu" }.count
+//    case "음료":
+//      return menuData.menuArray.filter { $0.category == "drink" }.count
+//    default:
+//      return menuData.menuArray.count
+//    }
+    let filteredMenu = filteredMenuData.filter { mainView.selectedCategory == "all" || $0.category == mainView.selectedCategory }
+    
+    return filteredMenu.count
   }
   
   /// collectionView 제약 조건
@@ -127,7 +228,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   /// - Parameters: 메뉴에서 버튼을 눌러 주문리스트에 추가하는 함수
   ///   - pay: 금액
   ///   - name: 상품
-  func addOrderList(_ pay: String, _ name: String) {
+  func addOrderList(_ pay: String, _ name: String) { //
     if menuData.nameData.contains(name) {
       checkDuplication = true
       for i in 0..<menuData.nameData.count {
@@ -146,6 +247,16 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     mainView.allCount.text = String(menuData.countData.reduce(0, +))
     mainView.payLabel.text = String(menuData.priceData.reduce(0, +))
     mainView.tableView.reloadData()
+    scrollToBottom(animated: true)
+  }
+  
+  func scrollToBottom(animated: Bool) {
+    let numberOfSections = mainView.tableView.numberOfSections
+    let numberOfRows = mainView.tableView.numberOfRows(inSection: numberOfSections-1)
+    if numberOfRows > 0 {
+      let indexPath = IndexPath(row: numberOfRows-1, section: numberOfSections-1)
+      mainView.tableView.scrollToRow(at: indexPath, at: .bottom, animated: animated)
+    }
   }
 
   /// setupTableView: 테이블 뷰 생성
@@ -254,7 +365,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     mainView.allCount.text = "0"
     mainView.payLabel.text = "0"
     mainView.tableView.reloadData()
-    print(10)
   }
   
   func clickedOrderButton() {

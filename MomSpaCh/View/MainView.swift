@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  MainView.swift
 //  MomSpaCh
 //
 //  Created by 김동현 on 7/2/24.
@@ -16,8 +16,7 @@ protocol MainViewDelegate: AnyObject {
 
 class MainView: UIView {
   weak var delegate: MainViewDelegate?
-  private let segmentedControl = UISegmentedControl(items: ["전체", "버거", "치킨", "사이드", "음료"])
-  var selectedCategory = "전체"
+  var selectedCategory = "all"
   let allCount = UILabel()
   let amount = UILabel()
   let payLabel = UILabel()
@@ -35,6 +34,39 @@ class MainView: UIView {
     return logo
   }()
   
+  let searchTextField: UITextField = {
+    let textField = UITextField()
+    textField.placeholder = "메뉴 검색"
+    textField.borderStyle = .roundedRect
+    return textField
+  }()
+  
+  let clearButton: UIButton = {
+    let button = UIButton(type: .custom)
+    button.setImage(UIImage(systemName: "multiply.circle.fill"), for: .normal)
+    button.tintColor = UIColor(
+      red: 217/255,
+      green: 69/255,
+      blue: 81/255,
+      alpha: 0.5
+    )
+    return button
+  }()
+  
+  let searchButton: UIButton = {
+    let button = UIButton(type: .system)
+    button.setImage(UIImage(systemName: "magnifyingglass"), for: .normal)
+    button.tintColor = UIColor(
+      red: 217/255,
+      green: 69/255,
+      blue: 81/255,
+      alpha: 0.5
+    )
+    return button
+  }()
+  
+  let segmentedControl = UISegmentedControl(items: ["전체", "버거", "치킨", "사이드", "음료"])
+  
   let menuCollectionView: UICollectionView = {
     let layout = UICollectionViewFlowLayout()
     let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -46,6 +78,7 @@ class MainView: UIView {
     self.backgroundColor = .systemBackground
     configureUI()
     logoConstraints()
+    setupSearchConstraints()
     setupSegmentedControl()
     setupSegmentedControlConstraints()
     setupCollectionViewConstraint()
@@ -60,7 +93,7 @@ class MainView: UIView {
   }
   
   func configureUI() {
-    [logo,segmentedControl, menuCollectionView, stackView, tableView, allCount, payLabel, tableView, orderQuantity, totalAmount].forEach { self.addSubview($0)}
+    [logo, searchTextField, clearButton, searchButton, segmentedControl, menuCollectionView, stackView, tableView, allCount, payLabel, tableView, orderQuantity, totalAmount].forEach { self.addSubview($0)}
     [productNameLabel, quantityLabel, amount].forEach {stackView.addArrangedSubview($0)}
   }
   
@@ -68,8 +101,22 @@ class MainView: UIView {
     logo.snp.makeConstraints {
       $0.width.equalTo(120)
       $0.height.equalTo(40)
-      $0.top.equalToSuperview().inset(60)
-      $0.leading.equalToSuperview().inset(20)
+      $0.leading.equalTo(self.safeAreaLayoutGuide.snp.leading).offset(20)
+      $0.bottom.equalTo(self.safeAreaLayoutGuide.snp.top).offset(40)
+    }
+  }
+  
+  func setupSearchConstraints() {
+    searchTextField.snp.makeConstraints {
+      $0.leading.equalTo(logo.snp.trailing).offset(10)
+      $0.centerY.equalTo(logo.snp.centerY)
+      $0.height.equalTo(40)
+    }
+    
+    searchButton.snp.makeConstraints {
+      $0.leading.equalTo(searchTextField.snp.trailing).offset(10)
+      $0.centerY.equalTo(searchTextField.snp.centerY)
+      $0.trailing.equalTo(self.safeAreaLayoutGuide.snp.trailing).offset(-20)
     }
   }
   
@@ -85,23 +132,15 @@ class MainView: UIView {
       blue: 81/255,
       alpha: 0.5
     )
-    segmentedControl.addTarget(self, action: #selector(categoryChanged(_:)), for: .valueChanged)
   }
   
   /// setupSegmentedControlConstraints: UISegmentedControl의 제약 조건을 설정하는 메서드
   private func setupSegmentedControlConstraints() {
     segmentedControl.snp.makeConstraints {
-      $0.leading.trailing.equalToSuperview().inset(20)
-      $0.top.equalToSuperview().offset(120)
+      $0.leading.equalTo(self.safeAreaLayoutGuide.snp.leading).offset(20)
+      $0.trailing.equalTo(self.safeAreaLayoutGuide.snp.trailing).offset(-20)
+      $0.top.equalTo(logo.snp.bottom).offset(10)
     }
-  }
-  
-  // View or Controller 정하기
-  /// categoryChanged: UISegmentedControl의 값이 변경되었을 때 호출되는 메서드
-  /// - Parameter sender: UISegmentedControl
-  @objc private func categoryChanged(_ sender: UISegmentedControl) {
-    selectedCategory = segmentedControl.titleForSegment(at: sender.selectedSegmentIndex) ?? "전체"
-    menuCollectionView.reloadData()
   }
   
   /// 컬렉션뷰 제약조건 설정
