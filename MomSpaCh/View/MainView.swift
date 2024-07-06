@@ -44,12 +44,7 @@ class MainView: UIView {
   let clearButton: UIButton = {
     let button = UIButton(type: .custom)
     button.setImage(UIImage(systemName: "multiply.circle.fill"), for: .normal)
-    button.tintColor = UIColor(
-      red: 217/255,
-      green: 69/255,
-      blue: 81/255,
-      alpha: 0.5
-    )
+    button.tintColor = UIColor(named: "spaColor")
     return button
   }()
   
@@ -72,6 +67,7 @@ class MainView: UIView {
     let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
     return collectionView
   }()
+  
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -271,3 +267,5 @@ class MainView: UIView {
     delegate?.clickedOrderButton()
   }
 }
+
+
