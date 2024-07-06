@@ -243,7 +243,16 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     mainView.allCount.text = String(menuData.countData.reduce(0, +))
     mainView.payLabel.text = String(menuData.priceData.reduce(0, +))
     mainView.tableView.reloadData()
-    
+    scrollToBottom(animated: true)
+  }
+  
+  func scrollToBottom(animated: Bool) {
+    let numberOfSections = mainView.tableView.numberOfSections
+    let numberOfRows = mainView.tableView.numberOfRows(inSection: numberOfSections-1)
+    if numberOfRows > 0 {
+      let indexPath = IndexPath(row: numberOfRows-1, section: numberOfSections-1)
+      mainView.tableView.scrollToRow(at: indexPath, at: .bottom, animated: animated)
+    }
   }
 
   /// setupTableView: 테이블 뷰 생성
