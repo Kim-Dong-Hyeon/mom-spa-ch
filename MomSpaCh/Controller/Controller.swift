@@ -36,10 +36,14 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     setupSearchTextField()
     setupTableView()
     setupCollectionView()
+    setupActions()
+    filteredMenuData = menuData.menuArray
+  }
+  
+  private func setupActions() {
     mainView.clearButton.addTarget(self, action: #selector(clearSearchText), for: .touchUpInside)
     mainView.searchButton.addTarget(self, action: #selector(searchButtonTapped), for: .touchUpInside)
     mainView.segmentedControl.addTarget(self, action: #selector(categoryChanged(_:)), for: .valueChanged)
-    filteredMenuData = menuData.menuArray
   }
   
   private func setupSearchTextField() {
