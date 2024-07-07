@@ -20,25 +20,26 @@ class MainView: UIView {
   let orderQuantity = UILabel()
   let stackView = UIStackView()
   let totalAmount = UILabel()
-  
+
   let logo : UIImageView = {
     let logo = UIImageView()
     logo.image = UIImage(named: "logo")
     logo.contentMode = .scaleAspectFit
     return logo
   }()
+
   let dutch: UILabel = {
     let label = UILabel()
     label.text = "더치 페이"
     return label
   }()
-  
+
   let memberCount: UILabel = {
     let label = UILabel()
     label.text = "인원 수"
     return label
   }()
-  
+
   let dutchPlus: UIButton = {
     let button = UIButton(type: .system)
     button.setImage(UIImage(systemName: "plus.square.fill"), for: .normal)
@@ -46,7 +47,7 @@ class MainView: UIView {
     button.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
     return button
   }()
-  
+
   let dutchMinus: UIButton = {
     let button = UIButton(type: .system)
     button.setImage(UIImage(systemName: "minus.square.fill"), for: .normal)
@@ -54,20 +55,20 @@ class MainView: UIView {
     button.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
     return button
   }()
-  
+
   let dutchCount: UILabel = {
     let label = UILabel()
     label.text = "1"
     label.textAlignment = .center
     return label
   }()
-  
+
   let dutchPrice: UILabel = {
     let label = UILabel()
     label.text = "1인당 결제 금액:"
     return label
   }()
-  
+
   let dutchPay: UILabel = {
     let label = UILabel()
     label.textAlignment = .right
@@ -75,14 +76,14 @@ class MainView: UIView {
     label.text = "0"
     return label
   }()
-  
+
   let wonLabel: UILabel = {
     let label = UILabel()
     label.text = "원"
     label.textAlignment = .center
     return label
   }()
-  
+
   let searchTextField: UITextField = {
     let textField = UITextField()
     textField.placeholder = "메뉴 검색"
@@ -92,21 +93,21 @@ class MainView: UIView {
     textField.layer.borderColor = UIColor(named: "spaColor")?.cgColor
     return textField
   }()
-  
+
   let clearButton: UIButton = {
     let button = UIButton(type: .custom)
     button.setImage(UIImage(systemName: "multiply.circle.fill"), for: .normal)
     button.tintColor = UIColor(named: "spaColor")
     return button
   }()
-  
+
   let searchButton: UIButton = {
     let button = UIButton(type: .system)
     button.setImage(UIImage(systemName: "magnifyingglass"), for: .normal)
     button.tintColor = UIColor(named: "spaColor")
     return button
   }()
-  
+
   let showNextMenu: UIButton = {
     let button = UIButton(type: .system)
     button.setImage(UIImage(systemName: "chevron.right"), for: .normal)
@@ -114,7 +115,7 @@ class MainView: UIView {
     button.tintColor = UIColor(named: "spaColor")
     return button
   }()
-  
+
   let showPreviousMenu: UIButton = {
     let button = UIButton(type: .system)
     button.setImage(UIImage(systemName: "chevron.left"), for: .normal)
@@ -122,7 +123,7 @@ class MainView: UIView {
     button.tintColor = UIColor(named: "spaColor")
     return button
   }()
-  
+
   let pageControl: UIPageControl = {
     let pagecontrol = UIPageControl()
     pagecontrol.pageIndicatorTintColor = .lightGray
@@ -130,15 +131,15 @@ class MainView: UIView {
     pagecontrol.numberOfPages = 8
     return pagecontrol
   }()
-  
+
   let segmentedControl = UISegmentedControl(items: ["전체", "버거", "치킨", "사이드", "음료"])
-  
+
   let menuCollectionView: UICollectionView = {
     let layout = UICollectionViewFlowLayout()
     let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
     return collectionView
   }()
-  
+
   let buttonStackView: UIStackView = {
     let stackView = UIStackView()
     stackView.axis = .horizontal
@@ -147,7 +148,7 @@ class MainView: UIView {
     stackView.spacing = 10
     return stackView
   }()
-  
+
   var orderButton: UIButton = {
     let button = UIButton(type: .system)
     button.setTitle("주문하기", for: .normal)
@@ -157,7 +158,7 @@ class MainView: UIView {
     button.layer.cornerRadius = 5
     return button
   }()
-  
+
   var cancelButton: UIButton = {
     let button = UIButton(type: .system)
     button.setTitle("취소", for: .normal)
@@ -171,7 +172,9 @@ class MainView: UIView {
     button.layer.cornerRadius = 5
     return button
   }()
-  
+
+// MARK: - UIViewController, UIButton, UILabel, UIImageView (Developer: 조수환)
+
   override init(frame: CGRect) {
     super.init(frame: frame)
     self.backgroundColor = .systemBackground
@@ -185,27 +188,29 @@ class MainView: UIView {
     setupPagingControlConstraints()
     makeTableView()
     tableViewConstraints()
-    //    setupDutchPayConstraints()
     setupButtonsStackViewConstraint()
     dutchPayConstraints()
   }
-  
+
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-  
+
   func configureUI() {
-    [logo, searchTextField, clearButton, searchButton, segmentedControl, menuCollectionView, pageControl, stackView, allCount, payLabel, tableView, showNextMenu, showPreviousMenu, orderQuantity, totalAmount, buttonStackView, dutchPlus, dutchCount, dutchMinus, dutchPrice, dutch, dutchPay, memberCount,wonLabel].forEach { self.addSubview($0) }
+    [logo, searchTextField, clearButton, searchButton, segmentedControl, menuCollectionView,
+     pageControl, stackView, allCount, payLabel, tableView, showNextMenu, showPreviousMenu,
+     orderQuantity, totalAmount, buttonStackView, dutchPlus, dutchCount, dutchMinus, dutchPrice,
+     dutch, dutchPay, memberCount,wonLabel
+    ].forEach { self.addSubview($0) }
     [productNameLabel, quantityLabel, amount].forEach { stackView.addArrangedSubview($0) }
-    [cancelButton, orderButton].forEach {buttonStackView.addArrangedSubview($0)}
+    [cancelButton, orderButton].forEach { buttonStackView.addArrangedSubview($0) }
   }
-  
+
   func dutchPayConstraints() {
     dutch.snp.makeConstraints {
       $0.leading.equalTo(self.safeAreaLayoutGuide.snp.leading).offset(20)
       $0.top.equalTo(pageControl.snp.bottom)
     }
-    
     memberCount.snp.makeConstraints {
       $0.leading.equalTo(dutch.snp.leading)
       $0.top.equalTo(dutch.snp.bottom).offset(5)
@@ -218,29 +223,24 @@ class MainView: UIView {
       $0.leading.equalTo(dutchCount.snp.trailing).inset(5)
       $0.centerY.equalTo(memberCount.snp.centerY)
     }
-    
     dutchCount.snp.makeConstraints {
       $0.leading.equalTo(memberCount.snp.trailing).offset(20)
       $0.centerY.equalTo(memberCount.snp.centerY)
     }
-    
     dutchPrice.snp.makeConstraints {
       $0.trailing.equalTo(self.safeAreaLayoutGuide.snp.trailing).offset(-150)
       $0.centerY.equalTo(memberCount.snp.centerY)
     }
-    
     dutchPay.snp.makeConstraints {
       $0.trailing.equalTo(wonLabel.snp.leading).offset(-5)
       $0.centerY.equalTo(memberCount.snp.centerY)
     }
-    
     wonLabel.snp.makeConstraints {
       $0.centerY.equalTo(memberCount.snp.centerY)
       $0.trailing.equalTo(self.safeAreaLayoutGuide.snp.trailing).offset(-50)
-      
     }
   }
-  
+
   func logoConstraints() {
     logo.snp.makeConstraints {
       $0.width.equalTo(120)
@@ -249,31 +249,29 @@ class MainView: UIView {
       $0.bottom.equalTo(self.safeAreaLayoutGuide.snp.top).offset(40)
     }
   }
-  
+
+// MARK: - UITextField, UIButton, UISegmentedControl (Developer: 김동현)
+
   func setupSearchConstraints() {
     searchTextField.snp.makeConstraints {
       $0.leading.equalTo(logo.snp.trailing).offset(10)
       $0.centerY.equalTo(logo.snp.centerY)
       $0.height.equalTo(40)
     }
-    
     searchButton.snp.makeConstraints {
       $0.leading.equalTo(searchTextField.snp.trailing).offset(10)
       $0.centerY.equalTo(searchTextField.snp.centerY)
       $0.trailing.equalTo(self.safeAreaLayoutGuide.snp.trailing).offset(-20)
     }
   }
-  
-  //segmentControl 파일 분리
-  // MARK: - UISegmentedControl (Developer: 김동현)
-  
+
   /// UISegmentedControl을 설정하고 초기 선택 색상을 지정하는 메서드
   private func setupSegmentedControl() {
     segmentedControl.selectedSegmentIndex = 0
     segmentedControl.selectedSegmentTintColor = UIColor(named: "spaColor")
   }
-  
-  /// setupSegmentedControlConstraints: UISegmentedControl의 제약 조건을 설정하는 메서드
+
+  /// UISegmentedControl의 제약 조건을 설정하는 메서드
   private func setupSegmentedControlConstraints() {
     segmentedControl.snp.makeConstraints {
       $0.leading.equalTo(self.safeAreaLayoutGuide.snp.leading).offset(20)
@@ -281,7 +279,9 @@ class MainView: UIView {
       $0.top.equalTo(logo.snp.bottom).offset(10)
     }
   }
-  
+
+// MARK: - UICollectionView, UIButton, UIPageControl (Developer: 김윤홍)
+
   /// 컬렉션뷰 제약조건 설정
   func setupCollectionViewConstraint() {
     menuCollectionView.snp.makeConstraints {
@@ -292,28 +292,29 @@ class MainView: UIView {
       $0.height.equalTo(350)
     }
   }
-  
+
   func setupPagingButtonConstraints() {
     showNextMenu.snp.makeConstraints {
       $0.trailing.equalToSuperview()
       $0.leading.equalTo(menuCollectionView.snp.trailing)
       $0.top.equalToSuperview().inset(350)
     }
-    
     showPreviousMenu.snp.makeConstraints {
       $0.leading.equalToSuperview()
       $0.trailing.equalTo(menuCollectionView.snp.leading)
       $0.top.equalToSuperview().inset(350)
     }
   }
-  
+
   func setupPagingControlConstraints() {
     pageControl.snp.makeConstraints {
       $0.top.equalTo(menuCollectionView.snp.bottom)
       $0.centerX.equalToSuperview()
     }
   }
-  
+
+// MARK: - UITableView, UIButton, UILabel, UIStackView (Developer: 백시훈)
+
   func makeTableView() {
     tableView.layer.borderWidth = 3.0
     tableView.layer.borderColor = UIColor(named: "spaColor")?.cgColor
@@ -330,7 +331,6 @@ class MainView: UIView {
     payLabel.textAlignment = .center
     payLabel.layer.borderColor = UIColor(named: "spaColor")?.cgColor
     payLabel.layer.cornerRadius = 5
-    
     productNameLabel.text = "제품명"
     quantityLabel.text = "수량"
     amount.text = "금액"
@@ -338,7 +338,7 @@ class MainView: UIView {
     totalAmount.text = "합계금액"
     stackView.spacing = 70
   }
-  
+
   func tableViewConstraints() {
     tableView.snp.makeConstraints {
       $0.height.equalTo(130)
@@ -346,7 +346,6 @@ class MainView: UIView {
       $0.trailing.equalTo(self.safeAreaLayoutGuide.snp.trailing).offset(-90)
       $0.bottom.equalTo(self.safeAreaLayoutGuide.snp.bottom).inset(60)
     }
-    
     allCount.snp.makeConstraints {
       $0.leading.equalTo(tableView.snp.trailing).offset(10)
       $0.trailing.equalTo(self.safeAreaLayoutGuide.snp.trailing).offset(-20)
@@ -374,46 +373,9 @@ class MainView: UIView {
       $0.centerX.equalTo(payLabel.snp.centerX)
     }
   }
-  
-  //  func setupDutchPayConstraints() {
-  //    dutch.snp.makeConstraints {
-  //      $0.leading.equalTo(self.safeAreaLayoutGuide.snp.leading).offset(20)
-  //      $0.bottom.equalTo(stackView.snp.top).offset(-50)
-  //    }
-  //
-  //    memberCount.snp.makeConstraints {
-  //      $0.leading.equalTo(dutch.snp.leading)
-  //      $0.top.equalTo(dutch.snp.bottom).offset(5)
-  //    }
-  //
-  //    dutchPlus.snp.makeConstraints {
-  //      $0.leading.equalTo(memberCount.snp.trailing).offset(5)
-  //      $0.centerY.equalTo(memberCount.snp.centerY)
-  //    }
-  //
-  //    dutchMinus.snp.makeConstraints {
-  //      $0.leading.equalTo(dutchCount.snp.trailing).offset(-5)
-  //      $0.centerY.equalTo(memberCount.snp.centerY)
-  //    }
-  //
-  //    dutchCount.snp.makeConstraints {
-  //      $0.leading.equalTo(dutchPlus.snp.trailing).offset(-5)
-  //      $0.centerY.equalTo(memberCount.snp.centerY)
-  //    }
-  //    dutchPrice.snp.makeConstraints {
-  //      $0.trailing.equalTo(self.safeAreaLayoutGuide.snp.trailing).offset(-150)
-  //      $0.centerY.equalTo(memberCount.snp.centerY)
-  //    }
-  //
-  //    dutchPay.snp.makeConstraints {
-  //      $0.leading.equalTo(dutchPrice.snp.trailing).offset(5)
-  //      $0.centerY.equalTo(memberCount.snp.centerY)
-  //    }
-  //}
-  
-  
-  // MARK: - UIStackView (Developer: 최건)
-  
+
+  // MARK: - UIStackView, UIButton, UIAlertController, UISwipeGestureRecognizer (Developer: 최건)
+
   /// cancelButton과 orderButton을 stackView에 추가 & layout
   func setupButtonsStackViewConstraint() {
     buttonStackView.snp.makeConstraints {
@@ -424,5 +386,3 @@ class MainView: UIView {
     }
   }
 }
-
-
