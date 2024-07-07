@@ -20,7 +20,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   static let identifier = "mainViewController"
   private let countLabel = UILabel()
   private let nameLabel = UILabel()
-
+  
   let cellCount = 4
   var currentIndex = 0
   // MARK: - UIViewController (Developer: 조수환)
@@ -50,6 +50,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     mainView.showPreviousMenu.addTarget(self, action: #selector(previousButtonTapped), for: .touchUpInside)
     mainView.cancelButton.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
     mainView.orderButton.addTarget(self, action: #selector(orderButtonTapped), for: .touchUpInside)
+    mainView.dutchPlus.addTarget(self, action: #selector(dutchPlusTapped), for: .touchUpInside)
+    mainView.dutchMinus.addTarget(self, action: #selector(dutchMinusTapped), for: .touchUpInside)
   }
   
   private func setupSearchTextField() {
@@ -171,7 +173,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     
     let startIndex = currentIndex * cellCount
     let item = filteredMenuData[startIndex + indexPath.item]
-
+    
     cell.configure(withImageName: item.imageName, price: item.menuPrice, name: item.menuName)
     
     cell.delegate = self
@@ -236,7 +238,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     mainView.pageControl.currentPage = 0
     currentIndex = 0
   }
-                        
+  
   // MARK: - UITableView (Developer: 백시훈)
   
   /// addOrderList
@@ -386,6 +388,9 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     menuData.countData = []
     mainView.allCount.text = "0"
     mainView.payLabel.text = "0"
+    updateDutchPay()
+    mainView.dutchCount.text = "1"
+
     mainView.tableView.reloadData()
   }
   
@@ -400,18 +405,33 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
       emptyAlert.addAction(okAction)
       present(emptyAlert, animated: true, completion: nil)
     } else {
-      let alert = UIAlertController(
-        title: "최종 결제 금액 \(mainView.payLabel.text!)원입니다. 주문하시겠습니까?",
-        message: "",
-        preferredStyle: .alert
-      )
-      let yesAction = UIAlertAction(title: "네", style: .default) { _ in
-        self.orderCompletedAlert()
+      if Int(mainView.dutchCount.text!)! > 1 {
+        let alert = UIAlertController(
+          title: "최종 결제 금액 \(mainView.payLabel.text!)원입니다.\n  주문하시겠습니까?",
+          message: "1인당 결제 금액은 \(mainView.dutchPay.text!)원 입니다.",
+          preferredStyle: .alert
+        )
+        let yesAction = UIAlertAction(title: "네", style: .default) { _ in
+          self.orderCompletedAlert()
+        }
+        let noAction = UIAlertAction(title: "아니오", style: .cancel, handler: nil)
+        alert.addAction(yesAction)
+        alert.addAction(noAction)
+        present(alert, animated: true, completion: nil)
+      } else {
+        let alert = UIAlertController(
+          title: "최종 결제 금액 \(mainView.payLabel.text!)원입니다.\n  주문하시겠습니까?",
+          message: "",
+          preferredStyle: .alert
+        )
+        let yesAction = UIAlertAction(title: "네", style: .default) { _ in
+          self.orderCompletedAlert()
+        }
+        let noAction = UIAlertAction(title: "아니오", style: .cancel, handler: nil)
+        alert.addAction(yesAction)
+        alert.addAction(noAction)
+        present(alert, animated: true, completion: nil)
       }
-      let noAction = UIAlertAction(title: "아니오", style: .cancel, handler: nil)
-      alert.addAction(yesAction)
-      alert.addAction(noAction)
-      present(alert, animated: true, completion: nil)
     }
   }
   
@@ -442,18 +462,18 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   @objc private func handleSwipe(_ gesture: UISwipeGestureRecognizer) {
     switch gesture.direction {
     case .left:
-        if let nextCategoryIndex = getNextCategory(after: mainView.selectedCategory) {
-            updateCategory(to: nextCategoryIndex)
-        }
+      if let nextCategoryIndex = getNextCategory(after: mainView.selectedCategory) {
+        updateCategory(to: nextCategoryIndex)
+      }
     case .right:
-        if let previousCategoryIndex = getPreviousCategory(before: mainView.selectedCategory) {
-            updateCategory(to: previousCategoryIndex)
-        }
+      if let previousCategoryIndex = getPreviousCategory(before: mainView.selectedCategory) {
+        updateCategory(to: previousCategoryIndex)
+      }
     default:
-        break
+      break
     }
   }
-
+  
   private func updateCategory(to newIndex: Int) {
     let categories = ["all", "burger", "chicken", "sideMenu", "drink"]
     mainView.segmentedControl.selectedSegmentIndex = newIndex
@@ -492,7 +512,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     mainView.pageControl.numberOfPages = (filteredMenuData.count + cellCount - 1) / cellCount
     mainView.pageControl.currentPage = 0
   }
-
+  
   private func getNextCategory(after currentCategory: String) -> Int? {
     let categories = ["all", "burger", "chicken", "sideMenu", "drink"]
     if let currentIndex = categories.firstIndex(of: currentCategory) {
@@ -517,5 +537,26 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
       filteredMenuData = filteredMenuData.filter { $0.category == mainView.selectedCategory }
     }
   }
+  
+  @objc func dutchPlusTapped() {
+    if let countText = mainView.dutchCount.text, let count = Int(countText) {
+      mainView.dutchCount.text = String(count + 1)
+      updateDutchPay()
+    }
+  }
+  
+  @objc func dutchMinusTapped() {
+    if let countText = mainView.dutchCount.text, let count = Int(countText),
+       count > 1 {
+      mainView.dutchCount.text = String(count - 1)
+      updateDutchPay()
+    }
+  }
+  
+  func updateDutchPay() {
+    if let countText = mainView.dutchCount.text, let count = Int(countText), let totalAmountText = mainView.payLabel.text, let total = Int(totalAmountText) {
+      let dutchAmount = total / count
+      mainView.dutchPay.text = "\(dutchAmount)"
+    }
+  }
 }
-
