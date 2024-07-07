@@ -209,11 +209,11 @@ class MainView: UIView {
   func dutchPayConstraints() {
     dutch.snp.makeConstraints {
       $0.leading.equalTo(self.safeAreaLayoutGuide.snp.leading).offset(20)
-      $0.top.equalTo(pageControl.snp.bottom)
+      $0.bottom.equalTo(memberCount.snp.top).offset(-5)
     }
     memberCount.snp.makeConstraints {
       $0.leading.equalTo(dutch.snp.leading)
-      $0.top.equalTo(dutch.snp.bottom).offset(5)
+      $0.bottom.equalTo(stackView.snp.top).offset(-10)
     }
     dutchMinus.snp.makeConstraints {
       $0.trailing.equalTo(dutchCount.snp.leading).offset(5)
