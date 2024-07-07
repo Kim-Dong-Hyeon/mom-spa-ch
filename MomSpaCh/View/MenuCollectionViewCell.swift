@@ -13,6 +13,7 @@ import SnapKit
 
 protocol MenuCollectionViewCellDelegate: AnyObject {
   func addOrderList(_: String, _: String)
+  func updateDutchPay()
 }
 
 /// UICollectionViewCell 클래스
@@ -92,5 +93,6 @@ class MenuCollectionViewCell: UICollectionViewCell {
     let price = priceLabel.text!.filter { $0 != "원" && $0 != " "}
     let name = nameLabel.text!
     delegate?.addOrderList(price, name)
+    delegate?.updateDutchPay()
   }
 }

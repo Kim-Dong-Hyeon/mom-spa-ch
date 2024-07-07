@@ -41,15 +41,17 @@ class MainView: UIView {
   
   let dutchPlus: UIButton = {
     let button = UIButton(type: .system)
-    button.setTitle("+", for: .normal)
-    button.setTitleColor(.black, for: .normal)
+    button.setImage(UIImage(systemName: "plus.square.fill"), for: .normal)
+    button.tintColor = UIColor(named: "spaColor")
+    button.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
     return button
   }()
   
   let dutchMinus: UIButton = {
     let button = UIButton(type: .system)
-    button.setTitle("-", for: .normal)
-    button.setTitleColor(.black, for: .normal)
+    button.setImage(UIImage(systemName: "minus.square.fill"), for: .normal)
+    button.tintColor = UIColor(named: "spaColor")
+    button.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
     return button
   }()
   
@@ -62,43 +64,32 @@ class MainView: UIView {
   
   let dutchPrice: UILabel = {
     let label = UILabel()
-    label.text = "1인당 결제 금액"
+    label.text = "1인당 결제 금액:"
     return label
   }()
   
   let dutchPay: UILabel = {
     let label = UILabel()
+    label.textAlignment = .right
+    label.adjustsFontSizeToFitWidth = true
     label.text = "0"
     return label
   }()
   
-@objc func dutchPlusTapped() {
-  if let countText = dutchCount.text, let count = Int(countText) {
-    dutchCount.text = String(count + 1)
-    updateDutchPay()
-  }
-}
-
-  @objc func dutchMinusTapped() {
-    if let countText = dutchCount.text, let count = Int(countText),
-      count > 1 {
-      dutchCount.text = String(count - 1)
-      updateDutchPay()
-    }
-  }
-
-  func updateDutchPay() {
-      if let countText = dutchCount.text, let count = Int(countText), let totalAmountText = payLabel.text, let total = Int(totalAmountText) {
-          let dutchAmount = total / count
-          dutchPay.text = "\(dutchAmount)"
-      }
-  }
-
-
+  let wonLabel: UILabel = {
+    let label = UILabel()
+    label.text = "원"
+    label.textAlignment = .center
+    return label
+  }()
+  
   let searchTextField: UITextField = {
     let textField = UITextField()
     textField.placeholder = "메뉴 검색"
     textField.borderStyle = .roundedRect
+    textField.layer.borderWidth = 1
+    textField.layer.cornerRadius = 3
+    textField.layer.borderColor = UIColor(named: "spaColor")?.cgColor
     return textField
   }()
   
@@ -173,8 +164,10 @@ class MainView: UIView {
     button.titleLabel?.font = UIFont(name: "HelveticaNeue-Bold", size: 20)
     button.backgroundColor = UIColor(named: "cancleButtonBackground")
     button.setTitleColor(UIColor(named: "spaColor"), for: .normal)
-    button.layer.borderWidth = 1
-    button.layer.borderColor = UIColor(named: "spaColor")?.cgColor
+    button.layer.borderWidth = 3
+    if let spaColor = UIColor(named: "spaColor") {
+      button.layer.borderColor = spaColor.cgColor
+    }
     button.layer.cornerRadius = 5
     return button
   }()
@@ -192,9 +185,9 @@ class MainView: UIView {
     setupPagingControlConstraints()
     makeTableView()
     tableViewConstraints()
-    setupButtonsStackView()
-    setupDutchPayConstraints()
+    //    setupDutchPayConstraints()
     setupButtonsStackViewConstraint()
+    dutchPayConstraints()
   }
   
   required init?(coder: NSCoder) {
@@ -202,13 +195,50 @@ class MainView: UIView {
   }
   
   func configureUI() {
-  [logo, searchTextField, clearButton, searchButton, segmentedControl, menuCollectionView, stackView, tableView, allCount, payLabel, tableView,
-   orderQuantity, totalAmount, dutch, memberCount, dutchPlus, dutchMinus, dutchCount, dutchPrice, dutchPay].forEach { self.addSubview($0) }
-      [productNameLabel, quantityLabel, amount].forEach { stackView.addArrangedSubview($0) }
+    [logo, searchTextField, clearButton, searchButton, segmentedControl, menuCollectionView, pageControl, stackView, allCount, payLabel, tableView, showNextMenu, showPreviousMenu, orderQuantity, totalAmount, buttonStackView, dutchPlus, dutchCount, dutchMinus, dutchPrice, dutch, dutchPay, memberCount,wonLabel].forEach { self.addSubview($0) }
+    [productNameLabel, quantityLabel, amount].forEach { stackView.addArrangedSubview($0) }
     [cancelButton, orderButton].forEach {buttonStackView.addArrangedSubview($0)}
+  }
+  
+  func dutchPayConstraints() {
+    dutch.snp.makeConstraints {
+      $0.leading.equalTo(self.safeAreaLayoutGuide.snp.leading).offset(20)
+      $0.top.equalTo(pageControl.snp.bottom)
+    }
     
-    dutchPlus.addTarget(self, action: #selector(dutchPlusTapped), for: .touchUpInside)
-    dutchMinus.addTarget(self, action: #selector(dutchMinusTapped), for: .touchUpInside)
+    memberCount.snp.makeConstraints {
+      $0.leading.equalTo(dutch.snp.leading)
+      $0.top.equalTo(dutch.snp.bottom).offset(5)
+    }
+    dutchMinus.snp.makeConstraints {
+      $0.trailing.equalTo(dutchCount.snp.leading).offset(5)
+      $0.centerY.equalTo(memberCount.snp.centerY)
+    }
+    dutchPlus.snp.makeConstraints {
+      $0.leading.equalTo(dutchCount.snp.trailing).inset(5)
+      $0.centerY.equalTo(memberCount.snp.centerY)
+    }
+    
+    dutchCount.snp.makeConstraints {
+      $0.leading.equalTo(memberCount.snp.trailing).offset(20)
+      $0.centerY.equalTo(memberCount.snp.centerY)
+    }
+    
+    dutchPrice.snp.makeConstraints {
+      $0.trailing.equalTo(self.safeAreaLayoutGuide.snp.trailing).offset(-150)
+      $0.centerY.equalTo(memberCount.snp.centerY)
+    }
+    
+    dutchPay.snp.makeConstraints {
+      $0.trailing.equalTo(wonLabel.snp.leading).offset(-5)
+      $0.centerY.equalTo(memberCount.snp.centerY)
+    }
+    
+    wonLabel.snp.makeConstraints {
+      $0.centerY.equalTo(memberCount.snp.centerY)
+      $0.trailing.equalTo(self.safeAreaLayoutGuide.snp.trailing).offset(-50)
+      
+    }
   }
   
   func logoConstraints() {
@@ -259,6 +289,7 @@ class MainView: UIView {
       $0.trailing.equalTo(self.safeAreaLayoutGuide.snp.trailing).offset(-40)
       $0.top.equalTo(segmentedControl.snp.bottom).offset(20)
       $0.bottom.equalTo(pageControl.snp.top)
+      $0.height.equalTo(350)
     }
   }
   
@@ -280,23 +311,25 @@ class MainView: UIView {
     pageControl.snp.makeConstraints {
       $0.top.equalTo(menuCollectionView.snp.bottom)
       $0.centerX.equalToSuperview()
-      $0.bottom.equalTo(stackView.snp.top)
     }
   }
   
   func makeTableView() {
-    tableView.layer.borderWidth = 1.0
-    tableView.layer.borderColor = UIColor.red.cgColor
+    tableView.layer.borderWidth = 3.0
+    tableView.layer.borderColor = UIColor(named: "spaColor")?.cgColor
+    tableView.layer.cornerRadius = 5
     tableView.rowHeight = 44
-    allCount.layer.borderWidth = 1.0
-    allCount.layer.borderColor = UIColor.red.cgColor
+    allCount.layer.borderWidth = 3.0
+    allCount.layer.borderColor = UIColor(named: "spaColor")?.cgColor
+    allCount.layer.cornerRadius = 5
     allCount.textAlignment = .center
     allCount.text = "0"
     payLabel.text = "0"
     payLabel.adjustsFontSizeToFitWidth = true
-    payLabel.layer.borderWidth = 1.0
+    payLabel.layer.borderWidth = 3.0
     payLabel.textAlignment = .center
-    payLabel.layer.borderColor = UIColor.red.cgColor
+    payLabel.layer.borderColor = UIColor(named: "spaColor")?.cgColor
+    payLabel.layer.cornerRadius = 5
     
     productNameLabel.text = "제품명"
     quantityLabel.text = "수량"
@@ -342,42 +375,42 @@ class MainView: UIView {
     }
   }
   
-  func setupDutchPayConstraints() {
-    dutch.snp.makeConstraints {
-      $0.leading.equalTo(self.safeAreaLayoutGuide.snp.leading).offset(20)
-      $0.bottom.equalTo(stackView.snp.top).offset(-50)
-    }
-      
-    memberCount.snp.makeConstraints {
-      $0.leading.equalTo(dutch.snp.leading)
-      $0.top.equalTo(dutch.snp.bottom).offset(5)
-    }
-      
-    dutchPlus.snp.makeConstraints {
-      $0.leading.equalTo(memberCount.snp.trailing).offset(5)
-      $0.centerY.equalTo(memberCount.snp.centerY)
-    }
-      
-    dutchMinus.snp.makeConstraints {
-      $0.leading.equalTo(dutchCount.snp.trailing).offset(-5)
-      $0.centerY.equalTo(memberCount.snp.centerY)
-    }
-      
-    dutchCount.snp.makeConstraints {
-      $0.leading.equalTo(dutchPlus.snp.trailing).offset(-5)
-      $0.centerY.equalTo(memberCount.snp.centerY)
-    }
-    dutchPrice.snp.makeConstraints {
-      $0.trailing.equalTo(self.safeAreaLayoutGuide.snp.trailing).offset(-150)
-      $0.centerY.equalTo(memberCount.snp.centerY)
-    }
-      
-    dutchPay.snp.makeConstraints {
-      $0.leading.equalTo(dutchPrice.snp.trailing).offset(5)
-      $0.centerY.equalTo(memberCount.snp.centerY)
-    }
-}
-
+  //  func setupDutchPayConstraints() {
+  //    dutch.snp.makeConstraints {
+  //      $0.leading.equalTo(self.safeAreaLayoutGuide.snp.leading).offset(20)
+  //      $0.bottom.equalTo(stackView.snp.top).offset(-50)
+  //    }
+  //
+  //    memberCount.snp.makeConstraints {
+  //      $0.leading.equalTo(dutch.snp.leading)
+  //      $0.top.equalTo(dutch.snp.bottom).offset(5)
+  //    }
+  //
+  //    dutchPlus.snp.makeConstraints {
+  //      $0.leading.equalTo(memberCount.snp.trailing).offset(5)
+  //      $0.centerY.equalTo(memberCount.snp.centerY)
+  //    }
+  //
+  //    dutchMinus.snp.makeConstraints {
+  //      $0.leading.equalTo(dutchCount.snp.trailing).offset(-5)
+  //      $0.centerY.equalTo(memberCount.snp.centerY)
+  //    }
+  //
+  //    dutchCount.snp.makeConstraints {
+  //      $0.leading.equalTo(dutchPlus.snp.trailing).offset(-5)
+  //      $0.centerY.equalTo(memberCount.snp.centerY)
+  //    }
+  //    dutchPrice.snp.makeConstraints {
+  //      $0.trailing.equalTo(self.safeAreaLayoutGuide.snp.trailing).offset(-150)
+  //      $0.centerY.equalTo(memberCount.snp.centerY)
+  //    }
+  //
+  //    dutchPay.snp.makeConstraints {
+  //      $0.leading.equalTo(dutchPrice.snp.trailing).offset(5)
+  //      $0.centerY.equalTo(memberCount.snp.centerY)
+  //    }
+  //}
+  
   
   // MARK: - UIStackView (Developer: 최건)
   
