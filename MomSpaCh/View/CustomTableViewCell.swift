@@ -22,17 +22,15 @@ class CustomTableViewCell: UITableViewCell {
 
   let plusButton: UIButton = {
     let button = UIButton(type: .system)
-    button.setTitle("+", for: .normal)
-    button.backgroundColor = .lightGray
-    button.setTitleColor(.white, for: .normal)
+    button.setImage(UIImage(systemName: "plus.square.fill"), for: .normal)
+    button.tintColor = UIColor(named: "spaColor")
     return button
   }()
 
   let minusButton: UIButton = {
     let button = UIButton(type: .system)
-    button.setTitle("-", for: .normal)
-    button.backgroundColor = .lightGray
-    button.setTitleColor(.white, for: .normal)
+    button.setImage(UIImage(systemName: "minus.square.fill"), for: .normal)
+    button.tintColor = UIColor(named: "spaColor")
     return button
   }()
 
@@ -53,7 +51,8 @@ class CustomTableViewCell: UITableViewCell {
   let payLabel: UILabel = {
     let label = UILabel()
     label.text = ""
-    label.textAlignment = .center
+    label.textAlignment = .right
+    label.adjustsFontSizeToFitWidth = true
     return label
   }()
 
@@ -76,23 +75,23 @@ class CustomTableViewCell: UITableViewCell {
     contentView.addSubview(itemNameLabel)
     contentView.addSubview(payLabel)
     contentView.addSubview(wonLabel)
-  
+
     createConstraint()
-  
+
     plusButton.addTarget(self, action: #selector(tappedPlusButton), for: .touchDown)
     minusButton.addTarget(self, action: #selector(tappedMinusButton), for: .touchDown)
   }
 
-  ///createConstraint : UI 제약조건 설정
+  /// createConstraint : UI 제약조건 설정
   private func createConstraint() {
-    plusButton.snp.makeConstraints {
+    minusButton.snp.makeConstraints {
       $0.centerX.equalTo(contentView.snp.centerX).offset(-5)
       $0.centerY.equalToSuperview()
       $0.height.equalTo(20)
       $0.width.equalTo(20)
     }
 
-    minusButton.snp.makeConstraints {
+    plusButton.snp.makeConstraints {
       $0.centerY.equalToSuperview()
       $0.centerX.equalTo(contentView.snp.centerX).offset(35)
       $0.height.equalTo(20)
@@ -113,12 +112,13 @@ class CustomTableViewCell: UITableViewCell {
 
     payLabel.snp.makeConstraints {
       $0.centerY.equalToSuperview()
-      $0.leading.equalTo(minusButton.snp.trailing).offset(20)
+      $0.trailing.equalTo(wonLabel.snp.leading)
     }
 
     wonLabel.snp.makeConstraints {
       $0.centerY.equalToSuperview()
-      $0.trailing.lessThanOrEqualTo(contentView.snp.trailing).inset(10)
+      $0.trailing.equalTo(contentView.snp.trailing).offset(-10)
+      $0.leading.equalTo(payLabel.snp.trailing)
     }
   }
 
@@ -143,13 +143,13 @@ class CustomTableViewCell: UITableViewCell {
   @objc func tappedPlusButton() {
     if let countText = countLabel.text, let count = Int(countText) {
       countLabel.text = String(count + 1)
-      if let payText = payLabel.text, let pay = Int(payText){
+      if let payText = payLabel.text, let pay = Int(payText) {
         payLabel.text = String((pay / count) * (count + 1))
       }
       delegate?.plusButtonTap(in: self)
     }
   }
-  
+
   /// init? : 디코딩을 위한 초기화 메서드 필수 구현
   /// - Parameter coder: 객체를 인코딩하고 디코딩하는 역할
   required init?(coder: NSCoder) {
