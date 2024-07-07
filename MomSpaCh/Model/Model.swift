@@ -18,7 +18,7 @@ struct MenuData {
   var countData = [Int]()
   var countSum = 0
   var paySum = 0
-  
+
   let categoryMapping: [String: String] = [
     "전체": "all",
     "버거": "burger",
@@ -26,7 +26,7 @@ struct MenuData {
     "사이드": "sideMenu",
     "음료": "drink"
   ]
-  
+
   let menuArray = [
     MenuItem(
       category: "burger",
