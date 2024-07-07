@@ -27,7 +27,74 @@ class MainView: UIView {
     logo.contentMode = .scaleAspectFit
     return logo
   }()
+  let dutch: UILabel = {
+    let label = UILabel()
+    label.text = "더치 페이"
+    return label
+  }()
   
+  let memberCount: UILabel = {
+    let label = UILabel()
+    label.text = "인원 수"
+    return label
+  }()
+  
+  let dutchPlus: UIButton = {
+    let button = UIButton(type: .system)
+    button.setTitle("+", for: .normal)
+    button.setTitleColor(.black, for: .normal)
+    return button
+  }()
+  
+  let dutchMinus: UIButton = {
+    let button = UIButton(type: .system)
+    button.setTitle("-", for: .normal)
+    button.setTitleColor(.black, for: .normal)
+    return button
+  }()
+  
+  let dutchCount: UILabel = {
+    let label = UILabel()
+    label.text = "1"
+    label.textAlignment = .center
+    return label
+  }()
+  
+  let dutchPrice: UILabel = {
+    let label = UILabel()
+    label.text = "1인당 결제 금액"
+    return label
+  }()
+  
+  let dutchPay: UILabel = {
+    let label = UILabel()
+    label.text = "0"
+    return label
+  }()
+  
+@objc func dutchPlusTapped() {
+  if let countText = dutchCount.text, let count = Int(countText) {
+    dutchCount.text = String(count + 1)
+    updateDutchPay()
+  }
+}
+
+  @objc func dutchMinusTapped() {
+    if let countText = dutchCount.text, let count = Int(countText),
+      count > 1 {
+      dutchCount.text = String(count - 1)
+      updateDutchPay()
+    }
+  }
+
+  func updateDutchPay() {
+      if let countText = dutchCount.text, let count = Int(countText), let totalAmountText = payLabel.text, let total = Int(totalAmountText) {
+          let dutchAmount = total / count
+          dutchPay.text = "\(dutchAmount)"
+      }
+  }
+
+
   let searchTextField: UITextField = {
     let textField = UITextField()
     textField.placeholder = "메뉴 검색"
@@ -125,9 +192,9 @@ class MainView: UIView {
     setupPagingControlConstraints()
     makeTableView()
     tableViewConstraints()
+    setupButtonsStackView()
+    setupDutchPayConstraints()
     setupButtonsStackViewConstraint()
-    
-    
   }
   
   required init?(coder: NSCoder) {
@@ -135,9 +202,13 @@ class MainView: UIView {
   }
   
   func configureUI() {
-    [logo, searchTextField, clearButton, searchButton, segmentedControl, menuCollectionView, stackView, tableView, allCount, payLabel, tableView, orderQuantity, totalAmount, showNextMenu, showPreviousMenu, pageControl, buttonStackView].forEach { self.addSubview($0)}
-    [productNameLabel, quantityLabel, amount].forEach {stackView.addArrangedSubview($0)}
+  [logo, searchTextField, clearButton, searchButton, segmentedControl, menuCollectionView, stackView, tableView, allCount, payLabel, tableView,
+   orderQuantity, totalAmount, dutch, memberCount, dutchPlus, dutchMinus, dutchCount, dutchPrice, dutchPay].forEach { self.addSubview($0) }
+      [productNameLabel, quantityLabel, amount].forEach { stackView.addArrangedSubview($0) }
     [cancelButton, orderButton].forEach {buttonStackView.addArrangedSubview($0)}
+    
+    dutchPlus.addTarget(self, action: #selector(dutchPlusTapped), for: .touchUpInside)
+    dutchMinus.addTarget(self, action: #selector(dutchMinusTapped), for: .touchUpInside)
   }
   
   func logoConstraints() {
@@ -270,6 +341,43 @@ class MainView: UIView {
       $0.centerX.equalTo(payLabel.snp.centerX)
     }
   }
+  
+  func setupDutchPayConstraints() {
+    dutch.snp.makeConstraints {
+      $0.leading.equalTo(self.safeAreaLayoutGuide.snp.leading).offset(20)
+      $0.bottom.equalTo(stackView.snp.top).offset(-50)
+    }
+      
+    memberCount.snp.makeConstraints {
+      $0.leading.equalTo(dutch.snp.leading)
+      $0.top.equalTo(dutch.snp.bottom).offset(5)
+    }
+      
+    dutchPlus.snp.makeConstraints {
+      $0.leading.equalTo(memberCount.snp.trailing).offset(5)
+      $0.centerY.equalTo(memberCount.snp.centerY)
+    }
+      
+    dutchMinus.snp.makeConstraints {
+      $0.leading.equalTo(dutchCount.snp.trailing).offset(-5)
+      $0.centerY.equalTo(memberCount.snp.centerY)
+    }
+      
+    dutchCount.snp.makeConstraints {
+      $0.leading.equalTo(dutchPlus.snp.trailing).offset(-5)
+      $0.centerY.equalTo(memberCount.snp.centerY)
+    }
+    dutchPrice.snp.makeConstraints {
+      $0.trailing.equalTo(self.safeAreaLayoutGuide.snp.trailing).offset(-150)
+      $0.centerY.equalTo(memberCount.snp.centerY)
+    }
+      
+    dutchPay.snp.makeConstraints {
+      $0.leading.equalTo(dutchPrice.snp.trailing).offset(5)
+      $0.centerY.equalTo(memberCount.snp.centerY)
+    }
+}
+
   
   // MARK: - UIStackView (Developer: 최건)
   
