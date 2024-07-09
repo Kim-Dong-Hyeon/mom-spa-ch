@@ -12,7 +12,7 @@ import SnapKit
 class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate,
                       CustomTableViewCellDelegate, UICollectionViewDelegate,
                       MenuCollectionViewCellDelegate, UICollectionViewDataSource,
-                      UICollectionViewDelegateFlowLayout {
+                      UICollectionViewDelegateFlowLayout, UITextFieldDelegate {
 
   var checkDuplication: Bool = false
   var menuData = MenuData()
@@ -95,8 +95,15 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 // MARK: - UITextField, UIButton, UISegmentedControl (Developer: 김동현)
 
   private func setupSearchTextField() {
+    mainView.searchTextField.delegate = self
     mainView.searchTextField.rightView = mainView.clearButton
     mainView.searchTextField.rightViewMode = .whileEditing
+  }
+  
+  func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+    searchButtonTapped()
+    textField.resignFirstResponder()
+    return true
   }
 
   @objc private func clearSearchText() {
