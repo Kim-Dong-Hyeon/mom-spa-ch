@@ -41,6 +41,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     setupActions()
     filteredMenuData = menuData.menuArray
     setupGestureRecognizers()
+    setupDismissKeyboardGesture()
   }
 
   private func setupActions() {
@@ -108,6 +109,16 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     mainView.menuCollectionView.reloadData()
     clearPagingControl()
+  }
+  
+  private func setupDismissKeyboardGesture() {
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+    tapGesture.cancelsTouchesInView = false
+    view.addGestureRecognizer(tapGesture)
+  }
+  
+  @objc private func dismissKeyboard() {
+    view.endEditing(true)
   }
 
   @objc private func searchButtonTapped() {
