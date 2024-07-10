@@ -20,15 +20,15 @@ protocol CustomTableViewCellDelegate: AnyObject {
 class CustomTableViewCell: UITableViewCell {
   weak var delegate: CustomTableViewCellDelegate?
 
-  let plusButton: UIButton = {
-    let button = UIButton(type: .system)
+  let plusButton: AnimationButton = {
+    let button = AnimationButton()
     button.setImage(UIImage(systemName: "plus.square.fill"), for: .normal)
     button.tintColor = UIColor(named: "spaColor")
     return button
   }()
 
-  let minusButton: UIButton = {
-    let button = UIButton(type: .system)
+  let minusButton: AnimationButton = {
+    let button = AnimationButton()
     button.setImage(UIImage(systemName: "minus.square.fill"), for: .normal)
     button.tintColor = UIColor(named: "spaColor")
     return button

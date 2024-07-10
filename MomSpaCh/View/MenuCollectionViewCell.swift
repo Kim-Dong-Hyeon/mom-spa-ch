@@ -22,8 +22,8 @@ class MenuCollectionViewCell: UICollectionViewCell {
   lazy var menuData = MenuData()
   static let identifier = "cell"
 
-  private lazy var menuButton: UIButton = {
-    var menuButton = UIButton()
+  private lazy var menuButton: AnimationButton = {
+    var menuButton = AnimationButton()
     menuButton.backgroundColor = UIColor(named: "menuButtonBackground")
     return menuButton
   }()
