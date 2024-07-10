@@ -116,6 +116,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     mainView.menuCollectionView.reloadData()
     clearPagingControl()
+    currentIndex = 0
   }
   
   private func setupDismissKeyboardGesture() {
@@ -129,29 +130,9 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   }
 
   @objc private func searchButtonTapped() {
-    let searchText = mainView.searchTextField.text ?? ""
-
-    if searchText.isEmpty {
-      filteredMenuData = menuData.menuArray
-    } else {
-      filteredMenuData = menuData.menuArray.filter { menuItem in
-        if searchText.range(of: "\\p{Hangul}", options: .regularExpression) != nil {
-          // 검색어에 한글이 포함된 경우 menuName과 비교
-          let containsMenuName = menuItem.menuName.contains(searchText)
-          return containsMenuName
-        } else {
-          // 검색어에 한글이 포함되지 않은 경우 imageName과 비교
-          let containsImageName = menuItem.imageName.lowercased().contains(searchText.lowercased())
-          return containsImageName
-        }
-      }
-    }
-    // 선택된 카테고리에 따라 다시 필터링
-    if mainView.selectedCategory != "all" {
-      filteredMenuData = filteredMenuData.filter { $0.category == mainView.selectedCategory }
-    }
-    mainView.menuCollectionView.reloadData()
+    menuDataFilter()
     clearPagingControl()
+    currentIndex = 0
     // 검색 결과가 없을 때 처리 추가
     if filteredMenuData.isEmpty {
       mainView.pageControl.numberOfPages = 0
@@ -162,41 +143,24 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   /// categoryChanged: UISegmentedControl의 값이 변경되었을 때 호출되는 메서드
   /// - Parameter sender: UISegmentedControl
   @objc private func categoryChanged(_ sender: UISegmentedControl) {
-    currentIndex = 0
-    let selectedCategoryKorean = mainView.segmentedControl.titleForSegment(
-      at: sender.selectedSegmentIndex
-    ) ?? "전체"
-    mainView.selectedCategory = menuData.categoryMapping[selectedCategoryKorean] ?? "all"
-    let searchText = mainView.searchTextField.text ?? ""
+//    currentIndex = 0
+    switch sender.selectedSegmentIndex {
+    case 0:
+      mainView.selectedCategory = "all"
+    case 1:
+      mainView.selectedCategory = "burger"
+    case 2:
+      mainView.selectedCategory = "chicken"
+    case 3:
+      mainView.selectedCategory = "sideMenu"
+    case 4:
+      mainView.selectedCategory = "drink"
+    default:
+      mainView.selectedCategory = "all"
+    }
     
-    if searchText.isEmpty {
-      filteredMenuData = menuData.menuArray
-    } else {
-      filteredMenuData = menuData.menuArray.filter { menuItem in
-        if searchText.range(of: "\\p{Hangul}", options: .regularExpression) != nil {
-          // 검색어에 한글이 포함된 경우 menuName과 비교
-          let containsMenuName = menuItem.menuName.contains(searchText)
-          return containsMenuName
-        } else {
-          // 검색어에 한글이 포함되지 않은 경우 imageName과 비교
-          let containsImageName = menuItem.imageName.lowercased().contains(searchText.lowercased())
-          return containsImageName
-        }
-      }
-    }
-    // 선택된 카테고리에 따라 다시 필터링
-    if mainView.selectedCategory != "all" {
-      filteredMenuData = filteredMenuData.filter { $0.category == mainView.selectedCategory }
-    }
-    mainView.menuCollectionView.reloadData()
-    clearPagingControl()
-    if !filteredMenuData.isEmpty {
-      mainView.menuCollectionView.scrollToItem(
-        at: IndexPath(item: 0, section: 0),
-        at: .top,
-        animated: true
-      )
-    }
+    menuDataFilter()
+    currentIndex = 0
   }
 
 // MARK: - UICollectionView, UIButton, UIPageControl (Developer: 김윤홍)
@@ -290,7 +254,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
   func clearPagingControl() {
     mainView.pageControl.numberOfPages = (filteredMenuData.count + cellCount - 1) / cellCount
     mainView.pageControl.currentPage = 0
-    currentIndex = 0
+//    currentIndex =
   }
 
 // MARK: - UITableView, UIButton, UILabel, UIStackView (Developer: 백시훈)
@@ -533,8 +497,21 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     let categories = ["all", "burger", "chicken", "sideMenu", "drink"]
     mainView.segmentedControl.selectedSegmentIndex = newIndex
     mainView.selectedCategory = categories[newIndex]
-    let searchText = mainView.searchTextField.text ?? ""
     
+    menuDataFilter()
+    if !filteredMenuData.isEmpty {
+      mainView.menuCollectionView.scrollToItem(
+        at: IndexPath(item: 0, section: 0),
+        at: .left, animated: true
+      )
+    }
+    clearPagingControl()
+    currentIndex = 0
+  }
+  
+  private func menuDataFilter() {
+    let searchText = mainView.searchTextField.text ?? ""
+
     if searchText.isEmpty {
       filteredMenuData = menuData.menuArray
     } else {
@@ -556,14 +533,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     currentIndex = 0
     mainView.menuCollectionView.reloadData()
-    if !filteredMenuData.isEmpty {
-      mainView.menuCollectionView.scrollToItem(
-        at: IndexPath(item: 0, section: 0),
-        at: .left, animated: true
-      )
-    }
-    mainView.pageControl.numberOfPages = (filteredMenuData.count + cellCount - 1) / cellCount
-    mainView.pageControl.currentPage = 0
   }
 
   private func getNextCategory(after currentCategory: String) -> Int? {
