@@ -40,16 +40,16 @@ class MainView: UIView {
     return label
   }()
 
-  let dutchPlus: UIButton = {
-    let button = UIButton(type: .system)
+  let dutchPlus: AnimationButton = {
+    let button = AnimationButton()
     button.setImage(UIImage(systemName: "plus.square.fill"), for: .normal)
     button.tintColor = UIColor(named: "spaColor")
     button.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
     return button
   }()
 
-  let dutchMinus: UIButton = {
-    let button = UIButton(type: .system)
+  let dutchMinus: AnimationButton = {
+    let button = AnimationButton()
     button.setImage(UIImage(systemName: "minus.square.fill"), for: .normal)
     button.tintColor = UIColor(named: "spaColor")
     button.transform = CGAffineTransform(scaleX: 0.7, y: 0.7)
@@ -94,30 +94,30 @@ class MainView: UIView {
     return textField
   }()
 
-  let clearButton: UIButton = {
-    let button = UIButton(type: .custom)
+  let clearButton: AnimationButton = {
+    let button = AnimationButton(type: .custom)
     button.setImage(UIImage(systemName: "multiply.circle.fill"), for: .normal)
     button.tintColor = UIColor(named: "spaColor")
     return button
   }()
 
-  let searchButton: UIButton = {
-    let button = UIButton(type: .system)
+  let searchButton: AnimationButton = {
+    let button = AnimationButton()
     button.setImage(UIImage(systemName: "magnifyingglass"), for: .normal)
     button.tintColor = UIColor(named: "spaColor")
     return button
   }()
 
-  let showNextMenu: UIButton = {
-    let button = UIButton(type: .system)
+  let showNextMenu: AnimationButton = {
+    let button = AnimationButton()
     button.setImage(UIImage(systemName: "chevron.right"), for: .normal)
     button.transform = CGAffineTransform(scaleX: 2, y: 2)
     button.tintColor = UIColor(named: "spaColor")
     return button
   }()
 
-  let showPreviousMenu: UIButton = {
-    let button = UIButton(type: .system)
+  let showPreviousMenu: AnimationButton = {
+    let button = AnimationButton()
     button.setImage(UIImage(systemName: "chevron.left"), for: .normal)
     button.transform = CGAffineTransform(scaleX: 2, y: 2)
     button.tintColor = UIColor(named: "spaColor")
@@ -149,8 +149,8 @@ class MainView: UIView {
     return stackView
   }()
 
-  var orderButton: UIButton = {
-    let button = UIButton(type: .system)
+  let orderButton: AnimationButton = {
+    let button = AnimationButton()
     button.setTitle("주문하기", for: .normal)
     button.titleLabel?.font = UIFont(name: "HelveticaNeue-Bold", size: 20)
     button.backgroundColor = UIColor(named: "spaColor")
@@ -159,8 +159,8 @@ class MainView: UIView {
     return button
   }()
 
-  var cancelButton: UIButton = {
-    let button = UIButton(type: .system)
+  let cancelButton: AnimationButton = {
+    let button = AnimationButton()
     button.setTitle("취소", for: .normal)
     button.titleLabel?.font = UIFont(name: "HelveticaNeue-Bold", size: 20)
     button.backgroundColor = UIColor(named: "cancleButtonBackground")
@@ -172,6 +172,8 @@ class MainView: UIView {
     button.layer.cornerRadius = 5
     return button
   }()
+  
+  
 
 // MARK: - UIViewController, UIButton, UILabel, UIImageView (Developer: 조수환)
 
