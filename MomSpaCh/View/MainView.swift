@@ -299,12 +299,12 @@ class MainView: UIView {
     showNextMenu.snp.makeConstraints {
       $0.trailing.equalToSuperview()
       $0.leading.equalTo(menuCollectionView.snp.trailing)
-      $0.top.equalToSuperview().inset(350)
+      $0.centerY.equalTo(menuCollectionView.snp.centerY)
     }
     showPreviousMenu.snp.makeConstraints {
       $0.leading.equalToSuperview()
       $0.trailing.equalTo(menuCollectionView.snp.leading)
-      $0.top.equalToSuperview().inset(350)
+      $0.centerY.equalTo(menuCollectionView.snp.centerY)
     }
   }
 
